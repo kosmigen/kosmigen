@@ -1,0 +1,44 @@
+---
+import { entries, entriesByRoute, updates } from '../lib/content';
+import { getPage, needsRender, originalArticle } from '../lib/pages';
+import { renderMarkdown } from '../lib/markdown';
+import MarkdownPage from '../components/MarkdownPage.astro';
+
+const { route } = Astro.props;
+const entry = entriesByRoute.get(route);
+const source = route === 'now/' ? updates[0] ?? entry : entry;
+const showNewDocs = route === 'notes/overview/' && entries.some((page) => page.route.startsWith('notes/') && !originalArticle(page.route));
+const live = needsRender(route) || showNewDocs;
+const rendered = live && source ? await renderMarkdown(source, source.body, originalArticle(route)) : undefined;
+const page = getPage(route, rendered?.headings);
+const body = rendered?.html ?? '';
+const articleBody = entry?.kind === 'post' ? body.replace(/<h1\b[^>]*>[\s\S]*?<\/h1>/i, '') : body;
+---
+
+<!doctype html>
+<html lang="zh" class="no-js">
+  <head>
+    <Fragment set:html={page.head} />
+    <meta name="generator" content={Astro.generator} />
+    {live && <style is:inline>
+      [data-md-color-scheme="slate"] .shiki,
+      [data-md-color-scheme="slate"] .shiki span {
+        color: var(--shiki-dark);
+        background-color: var(--shiki-dark-bg);
+      }
+    </style>}
+  </head>
+  <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom">
+    <Fragment set:html={page.prelude} />
+    <main class="md-main" data-md-component="main">
+      <Fragment set:html={page.sidebars} />
+      <div class="md-content" data-md-component="content">
+        {live
+          ? <MarkdownPage route={route} html={articleBody} headingId={rendered?.headings.find(({ depth }) => depth === 1)?.id} />
+          : <Fragment set:html={page.article} />}
+      </div>
+      <Fragment set:html={page.mainTail} />
+    </main>
+    <Fragment set:html={page.afterMain} />
+  </body>
+</html>

@@ -1,0 +1,9 @@
+icon: lucide/coffee
+
+nav:
+  - Java 入门: intro.md
+  - Java 概述: overview.md
+  - 核心: basics
+  - 进阶: advanced
+  - 框架: framework
+  - 第三方库: third-party

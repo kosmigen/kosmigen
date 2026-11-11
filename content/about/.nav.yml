@@ -1,0 +1,5 @@
+icon: lucide/users
+
+nav:
+  - 关于作者: author.md
+  - 关于网站: website.md

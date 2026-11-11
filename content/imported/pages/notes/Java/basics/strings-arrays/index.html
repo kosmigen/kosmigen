@@ -1,0 +1,254 @@
+<article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+
+
+
+  
+  
+
+
+
+
+
+
+
+  <h1 id="_1">字符串与数组<a class="headerlink" href="#_1" title="链接到本节">&para;</a></h1>
+<p>字符串用于保存和处理文本，数组用于保存固定数量、同一种元素类型的数据。它们是处理用户输入、文件内容和批量数据时最常见的基础类型。</p>
+<h2 id="_2">字符串<a class="headerlink" href="#_2" title="链接到本节">&para;</a></h2>
+<h3 id="_3">创建与字符串常量池<a class="headerlink" href="#_3" title="链接到本节">&para;</a></h3>
+<p>字符串字面量写在双引号中。相同内容的字面量在字符串常量池中只保留一份，两个变量引用同一个对象：</p>
+<div class="language-java highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">String</span><span class="w"> </span><span class="n">s1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;Welcome&quot;</span><span class="p">;</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="n">String</span><span class="w"> </span><span class="n">s2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;Welcome&quot;</span><span class="p">;</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">s1</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">s2</span><span class="p">);</span><span class="w"> </span><span class="c1">// true，同一个池中对象</span>
+</span></code></pre></div>
+<p><code>new String(...)</code> 显式创建新的字符串对象，即使内容与池中的字符串相同，引用也不相等：</p>
+<div class="language-java highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">String</span><span class="w"> </span><span class="n">s1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">String</span><span class="p">(</span><span class="s">&quot;Welcome&quot;</span><span class="p">);</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="n">String</span><span class="w"> </span><span class="n">s2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">String</span><span class="p">(</span><span class="s">&quot;Welcome&quot;</span><span class="p">);</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">s1</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">s2</span><span class="p">);</span><span class="w"> </span><span class="c1">// false，两个不同对象</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">s1</span><span class="p">.</span><span class="na">equals</span><span class="p">(</span><span class="n">s2</span><span class="p">));</span><span class="w"> </span><span class="c1">// true，内容相同</span>
+</span></code></pre></div>
+<p><code>String.intern()</code> 返回与当前内容对应的池中字符串。常量池是一种运行时的优化实现，比较内容仍应使用 <code>equals</code>，不要依赖池行为让 <code>==</code> 偶然正确。</p>
+<h3 id="_4">不可变性与常用操作<a class="headerlink" href="#_4" title="链接到本节">&para;</a></h3>
+<p><code>String</code> 是不可变类。对字符串调用 <code>strip()</code>、<code>replace()</code> 或拼接操作会产生结果字符串，原有字符串对象的内容不会因此改变。</p>
+<p><strong>语法：</strong></p>
+<div class="language-java highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">String</span><span class="w"> </span><span class="n">title</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;Java&quot;</span><span class="p">;</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="n">String</span><span class="w"> </span><span class="n">cleaned</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">title</span><span class="p">.</span><span class="na">strip</span><span class="p">();</span>
+</span></code></pre></div>
+<table>
+<thead>
+<tr>
+<th>常用操作</th>
+<th>方法或写法</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>获取长度</td>
+<td><code>text.length()</code></td>
+</tr>
+<tr>
+<td>是否为空或空白</td>
+<td><code>text.isEmpty()</code>、<code>text.isBlank()</code></td>
+</tr>
+<tr>
+<td>比较内容</td>
+<td><code>text.equals(other)</code>、<code>text.equalsIgnoreCase(other)</code></td>
+</tr>
+<tr>
+<td>查找内容</td>
+<td><code>text.contains("Java")</code>、<code>text.indexOf("a")</code></td>
+</tr>
+<tr>
+<td>前缀与后缀</td>
+<td><code>text.startsWith("Ja")</code>、<code>text.endsWith("va")</code></td>
+</tr>
+<tr>
+<td>截取片段</td>
+<td><code>text.substring(begin, end)</code>，包含起点、不包含终点</td>
+</tr>
+<tr>
+<td>去除两端空白</td>
+<td><code>text.strip()</code></td>
+</tr>
+<tr>
+<td>替换内容</td>
+<td><code>text.replace(old, new)</code></td>
+</tr>
+<tr>
+<td>大小写转换</td>
+<td><code>text.toUpperCase()</code>、<code>text.toLowerCase()</code></td>
+</tr>
+<tr>
+<td>分割文本</td>
+<td><code>text.split(regex)</code>，参数是正则表达式</td>
+</tr>
+<tr>
+<td>连接文本</td>
+<td><code>String.join(", ", items)</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="stringbuilder">StringBuilder<a class="headerlink" href="#stringbuilder" title="链接到本节">&para;</a></h3>
+<p>需要多次追加文本时，可以使用 <code>StringBuilder</code>。调用 <code>append()</code> 修改构建器的内容，最后通过 <code>toString()</code> 得到字符串。与 <code>String</code> 不同，<code>StringBuilder</code> 可变，适合循环中的拼接：</p>
+<div class="language-java highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">StringBuilder</span><span class="w"> </span><span class="n">builder</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">StringBuilder</span><span class="p">();</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mi">3</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">    </span><span class="n">builder</span><span class="p">.</span><span class="na">append</span><span class="p">(</span><span class="s">&quot;Lesson &quot;</span><span class="p">).</span><span class="na">append</span><span class="p">(</span><span class="n">i</span><span class="p">).</span><span class="na">append</span><span class="p">(</span><span class="s">&quot;\n&quot;</span><span class="p">);</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="p">}</span>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="n">String</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">builder</span><span class="p">.</span><span class="na">toString</span><span class="p">();</span>
+</span></code></pre></div>
+<table>
+<thead>
+<tr>
+<th>类</th>
+<th>线程安全</th>
+<th>使用场景</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>String</code></td>
+<td>不可变，天然安全</td>
+<td>保存和传递文本</td>
+</tr>
+<tr>
+<td><code>StringBuilder</code></td>
+<td>否</td>
+<td>单线程中的频繁拼接</td>
+</tr>
+<tr>
+<td><code>StringBuffer</code></td>
+<td>是，方法同步</td>
+<td>多线程共享的拼接，通常不如直接使用 <code>StringBuilder</code> 配合锁</td>
+</tr>
+</tbody>
+</table>
+<h2 id="_5">数组<a class="headerlink" href="#_5" title="链接到本节">&para;</a></h2>
+<p>数组的长度在创建后固定，使用从 <code>0</code> 开始的下标访问元素。</p>
+<p><strong>语法：</strong></p>
+<div class="language-java highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kt">int</span><span class="o">[]</span><span class="w"> </span><span class="n">scores</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="mi">72</span><span class="p">,</span><span class="w"> </span><span class="mi">85</span><span class="p">,</span><span class="w"> </span><span class="mi">93</span><span class="p">};</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="kt">int</span><span class="o">[]</span><span class="w"> </span><span class="n">buffer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="kt">int</span><span class="o">[</span><span class="mi">5</span><span class="o">]</span><span class="p">;</span><span class="w">          </span><span class="c1">// 默认值为 0</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">names</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">String</span><span class="o">[</span><span class="mi">3</span><span class="o">]</span><span class="p">;</span><span class="w">     </span><span class="c1">// 默认值为 null</span>
+</span></code></pre></div>
+<p>数组长度使用字段 <code>array.length</code>，字符串长度使用方法 <code>text.length()</code>。未初始化的数组元素获得默认值：数值类型为 <code>0</code>，<code>boolean</code> 为 <code>false</code>，引用类型为 <code>null</code>。</p>
+<p>多维数组是数组的数组：</p>
+<div class="language-java highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="kt">int</span><span class="o">[][]</span><span class="w"> </span><span class="n">matrix</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">    </span><span class="p">{</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">},</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">    </span><span class="p">{</span><span class="mi">4</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">,</span><span class="w"> </span><span class="mi">6</span><span class="p">}</span>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="p">};</span>
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">matrix</span><span class="p">.</span><span class="na">length</span><span class="p">);</span><span class="w">    </span><span class="c1">// 2，行数</span>
+</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">matrix</span><span class="o">[</span><span class="mi">0</span><span class="o">]</span><span class="p">.</span><span class="na">length</span><span class="p">);</span><span class="w"> </span><span class="c1">// 3，第一行的列数</span>
+</span></code></pre></div>
+<p><code>Arrays</code> 工具类提供排序、复制、比较和格式化输出等操作：</p>
+<div class="language-java highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="kt">int</span><span class="o">[]</span><span class="w"> </span><span class="n">sorted</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Arrays</span><span class="p">.</span><span class="na">copyOf</span><span class="p">(</span><span class="n">scores</span><span class="p">,</span><span class="w"> </span><span class="n">scores</span><span class="p">.</span><span class="na">length</span><span class="p">);</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="n">Arrays</span><span class="p">.</span><span class="na">sort</span><span class="p">(</span><span class="n">sorted</span><span class="p">);</span>
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">Arrays</span><span class="p">.</span><span class="na">toString</span><span class="p">(</span><span class="n">sorted</span><span class="p">));</span>
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">Arrays</span><span class="p">.</span><span class="na">equals</span><span class="p">(</span><span class="n">scores</span><span class="p">,</span><span class="w"> </span><span class="n">sorted</span><span class="p">));</span>
+</span></code></pre></div>
+<p><code>Arrays.copyOf</code> 创建新数组，排序只影响副本。数组中存放引用类型元素时，这种复制不会自动复制元素指向的对象。需要可变长度的序列时使用 <code>ArrayList</code> 等集合，见<a href="../collections/">集合框架</a>。</p>
+<h3 id="_6">字符串与数组互转<a class="headerlink" href="#_6" title="链接到本节">&para;</a></h3>
+<div class="language-java highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="kt">char</span><span class="o">[]</span><span class="w"> </span><span class="n">letters</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;Java&quot;</span><span class="p">.</span><span class="na">toCharArray</span><span class="p">();</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="n">String</span><span class="w"> </span><span class="n">word</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">String</span><span class="p">(</span><span class="n">letters</span><span class="p">);</span>
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">parts</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;a,b,c&quot;</span><span class="p">.</span><span class="na">split</span><span class="p">(</span><span class="s">&quot;,&quot;</span><span class="p">);</span>
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="n">String</span><span class="w"> </span><span class="n">joined</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">String</span><span class="p">.</span><span class="na">join</span><span class="p">(</span><span class="s">&quot;-&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">parts</span><span class="p">);</span><span class="w"> </span><span class="c1">// a-b-c</span>
+</span></code></pre></div>
+<h2 id="_7">示例：整理课程名称与成绩<a class="headerlink" href="#_7" title="链接到本节">&para;</a></h2>
+<div class="language-java highlight"><span class="filename">Main.java</span><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">java.util.Arrays</span><span class="p">;</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Main</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">raw</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;  Java Core  &quot;</span><span class="p">;</span>
+</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">title</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">raw</span><span class="p">.</span><span class="na">strip</span><span class="p">();</span>
+</span><span id="__span-8-7"><a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">sameTitle</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">String</span><span class="p">(</span><span class="s">&quot;Java Core&quot;</span><span class="p">);</span>
+</span><span id="__span-8-8"><a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a>
+</span><span id="__span-8-9"><a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a><span class="w">        </span><span class="kt">int</span><span class="o">[]</span><span class="w"> </span><span class="n">scores</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="mi">82</span><span class="p">,</span><span class="w"> </span><span class="mi">65</span><span class="p">,</span><span class="w"> </span><span class="mi">91</span><span class="p">};</span>
+</span><span id="__span-8-10"><a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a><span class="w">        </span><span class="kt">int</span><span class="o">[]</span><span class="w"> </span><span class="n">sorted</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Arrays</span><span class="p">.</span><span class="na">copyOf</span><span class="p">(</span><span class="n">scores</span><span class="p">,</span><span class="w"> </span><span class="n">scores</span><span class="p">.</span><span class="na">length</span><span class="p">);</span>
+</span><span id="__span-8-11"><a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a><span class="w">        </span><span class="n">Arrays</span><span class="p">.</span><span class="na">sort</span><span class="p">(</span><span class="n">sorted</span><span class="p">);</span>
+</span><span id="__span-8-12"><a id="__codelineno-8-12" name="__codelineno-8-12" href="#__codelineno-8-12"></a>
+</span><span id="__span-8-13"><a id="__codelineno-8-13" name="__codelineno-8-13" href="#__codelineno-8-13"></a><span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">title</span><span class="p">);</span>
+</span><span id="__span-8-14"><a id="__codelineno-8-14" name="__codelineno-8-14" href="#__codelineno-8-14"></a><span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">&quot;Same text: &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">title</span><span class="p">.</span><span class="na">equals</span><span class="p">(</span><span class="n">sameTitle</span><span class="p">));</span>
+</span><span id="__span-8-15"><a id="__codelineno-8-15" name="__codelineno-8-15" href="#__codelineno-8-15"></a><span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">&quot;Original: &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">Arrays</span><span class="p">.</span><span class="na">toString</span><span class="p">(</span><span class="n">scores</span><span class="p">));</span>
+</span><span id="__span-8-16"><a id="__codelineno-8-16" name="__codelineno-8-16" href="#__codelineno-8-16"></a><span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">&quot;Sorted: &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">Arrays</span><span class="p">.</span><span class="na">toString</span><span class="p">(</span><span class="n">sorted</span><span class="p">));</span>
+</span><span id="__span-8-17"><a id="__codelineno-8-17" name="__codelineno-8-17" href="#__codelineno-8-17"></a><span class="w">    </span><span class="p">}</span>
+</span><span id="__span-8-18"><a id="__codelineno-8-18" name="__codelineno-8-18" href="#__codelineno-8-18"></a><span class="p">}</span>
+</span></code></pre></div>
+<p><strong>输出：</strong></p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>Java Core
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>Same text: true
+</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>Original: [82, 65, 91]
+</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>Sorted: [65, 82, 91]
+</span></code></pre></div>
+<p><code>strip()</code> 返回去除两端空白的新字符串，原字符串不变。<code>equals</code> 比较内容，所以 <code>new String("Java Core")</code> 与 <code>title</code> 相等；如果这里使用 <code>==</code>，结果为 <code>false</code>。<code>Arrays.copyOf</code> 创建新数组，排序只影响副本。</p>
+<h2 id="_8">示例：整理课程名单<a class="headerlink" href="#_8" title="链接到本节">&para;</a></h2>
+<div class="language-java highlight"><span class="filename">Main.java</span><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Main</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">input</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot; Java Core , Data Structures , 算法&quot;</span><span class="p">;</span>
+</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="w">        </span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">names</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">input</span><span class="p">.</span><span class="na">split</span><span class="p">(</span><span class="s">&quot;,&quot;</span><span class="p">);</span>
+</span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>
+</span><span id="__span-10-6"><a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a><span class="w">        </span><span class="n">StringBuilder</span><span class="w"> </span><span class="n">lines</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">StringBuilder</span><span class="p">();</span>
+</span><span id="__span-10-7"><a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a><span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">name</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">names</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-10-8"><a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a><span class="w">            </span><span class="n">String</span><span class="w"> </span><span class="n">cleaned</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">name</span><span class="p">.</span><span class="na">strip</span><span class="p">();</span>
+</span><span id="__span-10-9"><a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a><span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">cleaned</span><span class="p">.</span><span class="na">isEmpty</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-10-10"><a id="__codelineno-10-10" name="__codelineno-10-10" href="#__codelineno-10-10"></a><span class="w">                </span><span class="n">lines</span><span class="p">.</span><span class="na">append</span><span class="p">(</span><span class="n">cleaned</span><span class="p">).</span><span class="na">append</span><span class="p">(</span><span class="n">System</span><span class="p">.</span><span class="na">lineSeparator</span><span class="p">());</span>
+</span><span id="__span-10-11"><a id="__codelineno-10-11" name="__codelineno-10-11" href="#__codelineno-10-11"></a><span class="w">            </span><span class="p">}</span>
+</span><span id="__span-10-12"><a id="__codelineno-10-12" name="__codelineno-10-12" href="#__codelineno-10-12"></a><span class="w">        </span><span class="p">}</span>
+</span><span id="__span-10-13"><a id="__codelineno-10-13" name="__codelineno-10-13" href="#__codelineno-10-13"></a>
+</span><span id="__span-10-14"><a id="__codelineno-10-14" name="__codelineno-10-14" href="#__codelineno-10-14"></a><span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">lines</span><span class="p">);</span>
+</span><span id="__span-10-15"><a id="__codelineno-10-15" name="__codelineno-10-15" href="#__codelineno-10-15"></a><span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">&quot;Total: &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">names</span><span class="p">.</span><span class="na">length</span><span class="p">);</span>
+</span><span id="__span-10-16"><a id="__codelineno-10-16" name="__codelineno-10-16" href="#__codelineno-10-16"></a><span class="w">    </span><span class="p">}</span>
+</span><span id="__span-10-17"><a id="__codelineno-10-17" name="__codelineno-10-17" href="#__codelineno-10-17"></a><span class="p">}</span>
+</span></code></pre></div>
+<p><strong>输出：</strong></p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>Java Core
+</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>Data Structures
+</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>算法
+</span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a>
+</span><span id="__span-11-5"><a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a>Total: 3
+</span></code></pre></div>
+<p><code>split(",")</code> 把原始文本按逗号分成三段，每段仍带有空白。循环中对每段执行 <code>strip()</code>，空段跳过，非空段追加到 <code>StringBuilder</code>，最后整体输出。<code>System.lineSeparator()</code> 是当前平台的换行符。</p>
+<h2 id="_9">字符、代码单元与长度<a class="headerlink" href="#_9" title="链接到本节">&para;</a></h2>
+<p><code>char</code> 表示一个 UTF-16 代码单元。某些字符需要两个代码单元，因此 <code>String.length()</code> 不一定等于用户看到的字符数量：</p>
+<div class="language-java highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="n">String</span><span class="w"> </span><span class="n">emoji</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;😀&quot;</span><span class="p">;</span>
+</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">emoji</span><span class="p">.</span><span class="na">length</span><span class="p">());</span><span class="w"> </span><span class="c1">// 2，两个 char</span>
+</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">emoji</span><span class="p">.</span><span class="na">codePointCount</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">emoji</span><span class="p">.</span><span class="na">length</span><span class="p">()));</span><span class="w"> </span><span class="c1">// 1，一个码点</span>
+</span></code></pre></div>
+<p>需要按 Unicode 码点处理文本时，可以使用 <code>codePoints()</code> 或 <code>codePointCount()</code>；按视觉字符分组还可能涉及组合字符等规则。</p>
+<h2 id="_10">注意事项<a class="headerlink" href="#_10" title="链接到本节">&para;</a></h2>
+<ul>
+<li>比较字符串内容使用 <code>equals</code>，不要依赖字符串常量池使 <code>==</code> 偶然得到正确结果。</li>
+<li><code>Arrays.sort(array)</code> 会直接改变传入的数组；需要保留原顺序时先复制。</li>
+<li>数组赋值 <code>copy = original</code> 只是复制引用，两个变量指向同一数组。</li>
+<li><code>split(".")</code> 中的点是正则语法，按普通点号分割通常需要写成 <code>split("\\.")</code>。</li>
+<li>循环中大量拼接字符串应使用 <code>StringBuilder</code>，避免产生大量中间字符串对象。</li>
+<li><code>substring</code> 的结束位置不包含终点，超出边界会抛出 <code>StringIndexOutOfBoundsException</code>。</li>
+</ul>
+<h2 id="_11">练习<a class="headerlink" href="#_11" title="链接到本节">&para;</a></h2>
+<ol>
+<li>用 <code>String.format</code> 把课程名称整理成“1. Java Core / 2. Data Structures”形式的带编号列表。</li>
+<li>统计一段文本的单词个数：按空白字符 <code>split("\\s+")</code> 分割，再排除空字符串。</li>
+</ol>
+<h2 id="_12">参考资料<a class="headerlink" href="#_12" title="链接到本节">&para;</a></h2>
+<ul>
+<li><a href="https://www.tpointtech.com/java-string">Tpoint Tech：Java Strings</a>。</li>
+<li><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html">Java 21 API：String</a>。</li>
+<li><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Arrays.html">Java 21 API：Arrays</a>。</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>

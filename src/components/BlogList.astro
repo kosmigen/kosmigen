@@ -1,0 +1,70 @@
+---
+import { archiveMonths, archiveRoute, href, postTags, posts, readingStats, tags } from '../lib/content';
+import { archivedMonth } from '../lib/pages';
+import { renderMarkdown } from '../lib/markdown';
+
+const { route } = Astro.props as { route: string };
+const month = archivedMonth(route);
+const pageNumber = Number(/\/page\/(\d+)\//.exec(route)?.[1] ?? 1);
+const candidates = month ? posts.filter(({ date }) => date.startsWith(month)) : posts;
+const list = month ? candidates : candidates.slice((pageNumber - 1) * 8, pageNumber * 8);
+const excerpts = await Promise.all((route === 'blog/tags/' ? [] : list).map((post) => renderMarkdown(post, post.body.split('<!-- more -->')[0].replace(/^#\s+.*$/m, '').trim())));
+const listing = (page: number) => href(page === 1 ? 'blog/' : `blog/page/${page}/`);
+---
+{route === 'blog/tags/' ? (
+  <article class="md-content__inner md-typeset">
+    <h1>Tags</h1>
+    {tags.sort().map((tag) => <section>
+      <h2 id={'tag:' + tag}>{tag}</h2>
+      <ul>{posts.filter((post) => postTags(post).includes(tag)).map((post) => <li><a href={href(post.route)}>{post.title}</a></li>)}</ul>
+    </section>)}
+  </article>
+) : (
+  <div class="md-content__inner kb-blog-index">
+    {month && <h1>{month.replace('-', ' 年 ') + ' 月'}</h1>}
+    <nav aria-label="博客归档">
+      <a href={href('blog/tags/')}>标签</a>
+      {archiveMonths.map((archive) => <a href={href(archiveRoute(archive))}>{archive}</a>)}
+    </nav>
+    <ol class="kb-blog-index__posts" aria-label="博客文章">
+      {list.map((post, index) => {
+        const [year, month, day] = post.date.split('-');
+        const { words, readtime } = readingStats(post);
+        return <li class="kb-blog-index__entry">
+          <article class={`md-post md-post--excerpt kb-blog-entry${post.meta.image ? ' kb-blog-entry--image-' + (post.meta.image_layout || 'top') : ''}`}>
+            <header class="kb-blog-entry__date">
+              <time datetime={post.date}>
+                <span class="kb-blog-entry__day">{month}.{day}</span>
+                <span class="kb-blog-entry__year">{year}</span>
+              </time>
+            </header>
+            <div class="kb-blog-entry__main">
+              <div class="kb-blog-entry__body">
+                <div class="md-post__content md-typeset kb-blog-entry__content">
+                  <h2><a class="toclink" href={href(post.route)}>{post.title}</a></h2>
+                  <Fragment set:html={excerpts[index].html} />
+                </div>
+                {post.meta.image && <a href={href(post.route)} class="kb-blog-entry__cover" aria-label={'阅读全文：' + post.title}>
+                  <img src={post.meta.image} alt={post.meta.image_alt || ''} width="640" height="480" loading="lazy" decoding="async" />
+                </a>}
+              </div>
+              <footer class="kb-blog-entry__footer">
+                <ul class="kb-blog-entry__meta" aria-label="文章元数据">
+                  {postTags(post).length > 0 && <li class="kb-blog-entry__tags">
+                    {postTags(post).map((tag) => <a href={href('blog/tags/#tag:' + tag)}>{tag}</a>)}
+                  </li>}
+                  <li class="kb-blog-entry__stats"><span>{readtime} min read</span><span>{words} words</span></li>
+                </ul>
+                <a class="kb-blog-entry__read" href={href(post.route)}>阅读全文 <span aria-hidden="true">→</span></a>
+              </footer>
+            </div>
+          </article>
+        </li>;
+      })}
+    </ol>
+    {!month && candidates.length > 8 && <nav aria-label="博客分页">
+      {pageNumber > 1 && <a href={listing(pageNumber - 1)}>上一页</a>}
+      {pageNumber * 8 < candidates.length && <a href={listing(pageNumber + 1)}>下一页</a>}
+    </nav>}
+  </div>
+)}

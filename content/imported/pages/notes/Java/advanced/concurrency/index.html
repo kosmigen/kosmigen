@@ -1,0 +1,212 @@
+<article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+
+
+
+  
+  
+
+
+
+
+
+
+
+  <h1 id="_1">并发编程<a class="headerlink" href="#_1" title="链接到本节">&para;</a></h1>
+<p>并发编程用于组织多个可以独立推进的任务。任务可以在时间上交错执行，也可以在不同处理器核心上同时执行；前者涉及并发，后者涉及并行。</p>
+<h2 id="_2">线程与任务<a class="headerlink" href="#_2" title="链接到本节">&para;</a></h2>
+<p><code>Thread</code> 表示线程，<code>Runnable</code> 描述不返回结果的任务。<code>Callable&lt;V&gt;</code> 可以返回结果，也可以声明受检异常。</p>
+<p>创建任务有两种常见方式：</p>
+<table>
+<thead>
+<tr>
+<th>方式</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>继承 <code>Thread</code> 并重写 <code>run()</code></td>
+<td>直接，但占用单继承位置，任务与线程机制耦合</td>
+</tr>
+<tr>
+<td>实现 <code>Runnable</code> 传给 <code>Thread</code> 或执行器</td>
+<td>任务与线程分离，可以复用同一份任务代码</td>
+</tr>
+</tbody>
+</table>
+<p><strong>语法：</strong></p>
+<div class="language-java highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">Thread</span><span class="w"> </span><span class="n">worker</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Thread</span><span class="p">(()</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">&quot;Working&quot;</span><span class="p">));</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="n">worker</span><span class="p">.</span><span class="na">start</span><span class="p">();</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">worker</span><span class="p">.</span><span class="na">join</span><span class="p">();</span>
+</span></code></pre></div>
+<p><code>start()</code> 启动新线程，直接调用 <code>run()</code> 只是当前线程中的普通方法调用。<code>join()</code> 等待目标线程结束。</p>
+<table>
+<thead>
+<tr>
+<th>方法</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>start()</code></td>
+<td>启动线程并执行 <code>run()</code></td>
+</tr>
+<tr>
+<td><code>join()</code></td>
+<td>等待线程结束，可带超时</td>
+</tr>
+<tr>
+<td><code>sleep(millis)</code></td>
+<td>让当前线程休眠，可能被中断提前唤醒</td>
+</tr>
+<tr>
+<td><code>interrupt()</code></td>
+<td>请求目标线程中断</td>
+</tr>
+<tr>
+<td><code>isAlive()</code></td>
+<td>线程是否已启动且尚未结束</td>
+</tr>
+<tr>
+<td><code>getState()</code></td>
+<td>查询线程状态</td>
+</tr>
+</tbody>
+</table>
+<p>线程状态包括 <code>NEW</code>、<code>RUNNABLE</code>、<code>BLOCKED</code>、<code>WAITING</code>、<code>TIMED_WAITING</code> 和 <code>TERMINATED</code>。<code>RUNNABLE</code> 既可能表示正在执行，也可能表示等待获得处理器时间。</p>
+<h2 id="_3">共享状态与同步<a class="headerlink" href="#_3" title="链接到本节">&para;</a></h2>
+<p>多个线程操作同一份可变数据时，需要同时考虑：</p>
+<table>
+<thead>
+<tr>
+<th>问题</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>原子性</td>
+<td>一组操作是否会被其他线程插入干扰</td>
+</tr>
+<tr>
+<td>可见性</td>
+<td>一个线程的写入何时能被其他线程观察到</td>
+</tr>
+<tr>
+<td>顺序约束</td>
+<td>操作之间建立了哪些可靠的先后关系</td>
+</tr>
+</tbody>
+</table>
+<p><code>synchronized</code> 可以保护临界区：</p>
+<div class="language-java highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kd">class</span> <span class="nc">Counter</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">value</span><span class="p">;</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">    </span><span class="kd">synchronized</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">add</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">amount</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">        </span><span class="n">value</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">amount</span><span class="p">;</span>
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">    </span><span class="p">}</span>
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>
+</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="w">    </span><span class="kd">synchronized</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="nf">value</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">value</span><span class="p">;</span>
+</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="w">    </span><span class="p">}</span>
+</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="p">}</span>
+</span></code></pre></div>
+<p>方法上的 <code>synchronized</code> 以当前对象为锁；同一个对象的同步方法同一时间只允许一个线程执行。锁粒度需要平衡：过大的临界区会降低并发度，过小则可能留下未保护的读写路径。</p>
+<p><code>java.util.concurrent.locks.Lock</code> 提供更灵活的加锁能力，例如跨方法解锁和尝试加锁；原子类提供特定的原子操作；<code>volatile</code> 提供可见性与相应的顺序约束。但 <code>volatile int count</code> 不能使 <code>count++</code> 自动成为原子操作。</p>
+<p>多个线程并发访问集合时，可以使用 <code>ConcurrentHashMap</code>、<code>BlockingQueue</code> 等并发集合；<code>Collections.synchronizedList</code> 等方式返回的包装器仍需在外层手动同步迭代等复合操作。</p>
+<h2 id="_4">示例一：安全累计计数<a class="headerlink" href="#_4" title="链接到本节">&para;</a></h2>
+<div class="language-java highlight"><span class="filename">Main.java</span><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">java.util.concurrent.atomic.AtomicInteger</span><span class="p">;</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Main</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">InterruptedException</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">        </span><span class="n">AtomicInteger</span><span class="w"> </span><span class="n">count</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">AtomicInteger</span><span class="p">();</span>
+</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="w">        </span><span class="n">Runnable</span><span class="w"> </span><span class="n">task</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="w">            </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">1000</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="w">                </span><span class="n">count</span><span class="p">.</span><span class="na">incrementAndGet</span><span class="p">();</span>
+</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="w">            </span><span class="p">}</span>
+</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="w">        </span><span class="p">};</span>
+</span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>
+</span><span id="__span-2-12"><a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a><span class="w">        </span><span class="n">Thread</span><span class="w"> </span><span class="n">first</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Thread</span><span class="p">(</span><span class="n">task</span><span class="p">);</span>
+</span><span id="__span-2-13"><a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a><span class="w">        </span><span class="n">Thread</span><span class="w"> </span><span class="n">second</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Thread</span><span class="p">(</span><span class="n">task</span><span class="p">);</span>
+</span><span id="__span-2-14"><a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a><span class="w">        </span><span class="n">first</span><span class="p">.</span><span class="na">start</span><span class="p">();</span>
+</span><span id="__span-2-15"><a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a><span class="w">        </span><span class="n">second</span><span class="p">.</span><span class="na">start</span><span class="p">();</span>
+</span><span id="__span-2-16"><a id="__codelineno-2-16" name="__codelineno-2-16" href="#__codelineno-2-16"></a><span class="w">        </span><span class="n">first</span><span class="p">.</span><span class="na">join</span><span class="p">();</span>
+</span><span id="__span-2-17"><a id="__codelineno-2-17" name="__codelineno-2-17" href="#__codelineno-2-17"></a><span class="w">        </span><span class="n">second</span><span class="p">.</span><span class="na">join</span><span class="p">();</span>
+</span><span id="__span-2-18"><a id="__codelineno-2-18" name="__codelineno-2-18" href="#__codelineno-2-18"></a>
+</span><span id="__span-2-19"><a id="__codelineno-2-19" name="__codelineno-2-19" href="#__codelineno-2-19"></a><span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">&quot;Count: &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">count</span><span class="p">.</span><span class="na">get</span><span class="p">());</span>
+</span><span id="__span-2-20"><a id="__codelineno-2-20" name="__codelineno-2-20" href="#__codelineno-2-20"></a><span class="w">    </span><span class="p">}</span>
+</span><span id="__span-2-21"><a id="__codelineno-2-21" name="__codelineno-2-21" href="#__codelineno-2-21"></a><span class="p">}</span>
+</span></code></pre></div>
+<p><strong>输出：</strong></p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>Count: 2000
+</span></code></pre></div>
+<p>原子自增避免了更新丢失，两个 <code>join()</code> 确保主线程在所有累加完成后读取结果。线程内部的执行先后顺序不影响本例最终结果。</p>
+<h2 id="_5">执行器与异步结果<a class="headerlink" href="#_5" title="链接到本节">&para;</a></h2>
+<p><code>ExecutorService</code> 接收并调度任务，<code>Future</code> 表示尚未获得或已经获得的结果。<code>CompletableFuture</code> 进一步支持结果转换、任务组合和异常恢复。</p>
+<h3 id="_6">示例二：合并两个任务的结果<a class="headerlink" href="#_6" title="链接到本节">&para;</a></h3>
+<p>本例使用 JDK 21 的执行器自动关闭能力：</p>
+<div class="language-java highlight"><span class="filename">Main.java</span><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">java.util.concurrent.CompletableFuture</span><span class="p">;</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="kn">import</span><span class="w"> </span><span class="nn">java.util.concurrent.ExecutorService</span><span class="p">;</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="kn">import</span><span class="w"> </span><span class="nn">java.util.concurrent.Executors</span><span class="p">;</span>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Main</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">Exception</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="w">        </span><span class="k">try</span><span class="w"> </span><span class="p">(</span><span class="n">ExecutorService</span><span class="w"> </span><span class="n">pool</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Executors</span><span class="p">.</span><span class="na">newFixedThreadPool</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="w">            </span><span class="n">CompletableFuture</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span><span class="w"> </span><span class="n">reading</span><span class="w"> </span><span class="o">=</span>
+</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="w">                    </span><span class="n">CompletableFuture</span><span class="p">.</span><span class="na">supplyAsync</span><span class="p">(()</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="mi">25</span><span class="p">,</span><span class="w"> </span><span class="n">pool</span><span class="p">);</span>
+</span><span id="__span-4-10"><a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="w">            </span><span class="n">CompletableFuture</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span><span class="w"> </span><span class="n">coding</span><span class="w"> </span><span class="o">=</span>
+</span><span id="__span-4-11"><a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="w">                    </span><span class="n">CompletableFuture</span><span class="p">.</span><span class="na">supplyAsync</span><span class="p">(()</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="mi">35</span><span class="p">,</span><span class="w"> </span><span class="n">pool</span><span class="p">);</span>
+</span><span id="__span-4-12"><a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a>
+</span><span id="__span-4-13"><a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a><span class="w">            </span><span class="kt">int</span><span class="w"> </span><span class="n">total</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">reading</span><span class="p">.</span><span class="na">thenCombine</span><span class="p">(</span><span class="n">coding</span><span class="p">,</span><span class="w"> </span><span class="n">Integer</span><span class="p">::</span><span class="n">sum</span><span class="p">).</span><span class="na">get</span><span class="p">();</span>
+</span><span id="__span-4-14"><a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a><span class="w">            </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">&quot;Total minutes: &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">total</span><span class="p">);</span>
+</span><span id="__span-4-15"><a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a><span class="w">        </span><span class="p">}</span>
+</span><span id="__span-4-16"><a id="__codelineno-4-16" name="__codelineno-4-16" href="#__codelineno-4-16"></a><span class="w">    </span><span class="p">}</span>
+</span><span id="__span-4-17"><a id="__codelineno-4-17" name="__codelineno-4-17" href="#__codelineno-4-17"></a><span class="p">}</span>
+</span></code></pre></div>
+<p><strong>输出：</strong></p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>Total minutes: 60
+</span></code></pre></div>
+<p><code>thenCombine</code> 在两个结果都可用时进行合并。<code>get()</code> 等待结果，因此这里是“异步启动任务，在最后同步等待”。异步不意味着调用链中不存在阻塞。</p>
+<h2 id="_7">虚拟线程<a class="headerlink" href="#_7" title="链接到本节">&para;</a></h2>
+<p>Java 21 正式提供虚拟线程，可以通过 <code>Thread.ofVirtual()</code> 或 <code>Executors.newVirtualThreadPerTaskExecutor()</code> 使用。它们适合承载大量需要等待 IO 的任务，不会使 CPU 密集计算自动加速，也不改变共享状态的同步要求。</p>
+<p>并发任务的数量与下游容量仍需协调，例如数据库连接数和远端服务的承载能力。</p>
+<h2 id="_8">注意事项<a class="headerlink" href="#_8" title="链接到本节">&para;</a></h2>
+<ul>
+<li>线程池需要关闭；还应明确排队容量、任务超时与拒绝策略。</li>
+<li>取消任务不等于任务一定已经停止，需要任务代码配合处理中断或取消信号。</li>
+<li><code>Future.get()</code> 的失败、等待超时和线程中断是不同情况，应分别处理。</li>
+<li>使用锁时保持一致的获取顺序，避免持锁执行不必要的长时间阻塞操作。</li>
+<li>不要让线程悄悄吞掉中断；响应中断时应恢复中断标记或明确结束任务。</li>
+</ul>
+<h2 id="_9">练习<a class="headerlink" href="#_9" title="链接到本节">&para;</a></h2>
+<ol>
+<li>为两个异步任务增加失败分支，使用 <code>exceptionally</code> 提供一个明确的替代值。说明替代值会不会掩盖真实失败，以及调用方如何识别这类结果。</li>
+<li>把示例一改成 <code>synchronized</code> 计数器版本，比较两种写法需要维护的代码，以及误把 <code>volatile</code> 当作原子操作时可能出现的输出。</li>
+</ol>
+<h2 id="_10">参考资料<a class="headerlink" href="#_10" title="链接到本节">&para;</a></h2>
+<ul>
+<li><a href="https://www.tpointtech.com/multithreading-in-java">Tpoint Tech：Multithreading in Java</a>。</li>
+<li><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/concurrent/package-summary.html">Java 21 API：java.util.concurrent</a>。</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>

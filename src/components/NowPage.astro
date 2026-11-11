@@ -1,0 +1,25 @@
+---
+import { href, nowIntro, updates, type Entry } from '../lib/content';
+const { entry, html } = Astro.props as { entry?: Entry; html: string };
+const current = entry?.kind === 'update' ? entry : updates[0];
+const root = entry?.route === 'now/';
+---
+<div class="kb-now">
+  <header class="kb-now-header">
+    <h1>{root ? 'Now' : current?.meta.title || 'Now'}</h1>
+    {nowIntro && <p class="kb-now-intro">{nowIntro}</p>}
+    {current && <p class="kb-now-date"><span>Updated</span> <time datetime={current.date}>{current.date.replaceAll('-', '.')}</time></p>}
+  </header>
+  <div class="kb-now-content" set:html={html} />
+  {updates.length > 0 && <details class="kb-now-history">
+    <summary>Past updates <span>{updates.length}</span></summary>
+    <ol>
+      {updates.map((update, i) => <li><a href={href(update.route)}>
+        <time datetime={update.date}>{update.date.replaceAll('-', '.')}</time>
+        {update.meta.title && <span>{update.meta.title}</span>}
+        {i === 0 && <small>Latest</small>}
+      </a></li>)}
+    </ol>
+  </details>}
+  <p class="kb-now-colophon">A <a href="https://nownownow.com/about">/now page</a>.</p>
+</div>

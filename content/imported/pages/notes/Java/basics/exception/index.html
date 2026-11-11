@@ -1,0 +1,249 @@
+<article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+
+
+
+  
+  
+
+
+
+
+
+
+
+  <h1 id="_1">异常处理<a class="headerlink" href="#_1" title="链接到本节">&para;</a></h1>
+<p>异常用于表示执行过程中无法按当前路径继续完成的情况，例如输入格式错误、文件无法读取或网络请求失败。Java 使用异常对象携带错误类型、消息和调用栈信息。</p>
+<h2 id="_2">异常体系<a class="headerlink" href="#_2" title="链接到本节">&para;</a></h2>
+<p><code>Throwable</code> 是异常与错误的共同父类，主要分为 <code>Exception</code> 和 <code>Error</code> 两个分支。</p>
+<table>
+<thead>
+<tr>
+<th>类型</th>
+<th>编译器要求</th>
+<th>常见示例</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>受检异常</td>
+<td>必须捕获或通过 <code>throws</code> 声明</td>
+<td><code>IOException</code>、<code>ClassNotFoundException</code></td>
+</tr>
+<tr>
+<td>非受检异常</td>
+<td>不强制捕获或声明</td>
+<td><code>IllegalArgumentException</code>、<code>NullPointerException</code></td>
+</tr>
+<tr>
+<td><code>Error</code> 及其子类</td>
+<td>不强制捕获或声明，通常表示严重运行问题</td>
+<td><code>OutOfMemoryError</code></td>
+</tr>
+</tbody>
+</table>
+<p><code>RuntimeException</code> 及其子类属于非受检异常。异常类分布在多个包中，例如 <code>IOException</code> 属于 <code>java.io</code>。</p>
+<p>常见异常及触发场景：</p>
+<table>
+<thead>
+<tr>
+<th>异常</th>
+<th>常见触发</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ArithmeticException</code></td>
+<td>整数除以零</td>
+</tr>
+<tr>
+<td><code>NullPointerException</code></td>
+<td>对 <code>null</code> 调用方法或访问字段</td>
+</tr>
+<tr>
+<td><code>NumberFormatException</code></td>
+<td>把非数字文本解析为数字</td>
+</tr>
+<tr>
+<td><code>ArrayIndexOutOfBoundsException</code></td>
+<td>数组下标越界</td>
+</tr>
+<tr>
+<td><code>ClassCastException</code></td>
+<td>不兼容的强制类型转换</td>
+</tr>
+</tbody>
+</table>
+<p>浮点数除法不会抛出 <code>ArithmeticException</code>：<code>1.0 / 0</code> 得到 <code>Infinity</code>，<code>0.0 / 0.0</code> 得到 <code>NaN</code>。</p>
+<h2 id="_3">基本语法<a class="headerlink" href="#_3" title="链接到本节">&para;</a></h2>
+<div class="language-java highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">    </span><span class="c1">// 可能失败的操作</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">具体异常类型</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">    </span><span class="c1">// 处理已知失败</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="p">}</span><span class="w"> </span><span class="k">finally</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">    </span><span class="c1">// 通常用于必须执行的清理操作</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="p">}</span>
+</span></code></pre></div>
+<p>多个 <code>catch</code> 按从上到下的顺序匹配，较具体的异常类型应放在较一般的类型之前。多种异常需要相同处理时，可以使用多异常捕获；用 <code>|</code> 合并的类型之间不能有继承关系：</p>
+<div class="language-java highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">IOException</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">SQLException</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">    </span><span class="c1">// 两种异常按同一方式处理</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="p">}</span>
+</span></code></pre></div>
+<table>
+<thead>
+<tr>
+<th>关键字</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>try</code></td>
+<td>包围需要处理异常的操作</td>
+</tr>
+<tr>
+<td><code>catch</code></td>
+<td>捕获匹配类型的异常</td>
+</tr>
+<tr>
+<td><code>finally</code></td>
+<td>在退出 <code>try</code> 或 <code>catch</code> 时执行收尾操作</td>
+</tr>
+<tr>
+<td><code>throw</code></td>
+<td>抛出一个异常对象</td>
+</tr>
+<tr>
+<td><code>throws</code></td>
+<td>在方法声明上说明可能传播的异常类型</td>
+</tr>
+</tbody>
+</table>
+<p><code>finally</code> 在 <code>try</code> 正常完成、抛出异常或执行 <code>return</code> 时都会运行；如果过程中调用了 <code>System.exit</code> 或进程被强制终止，<code>finally</code> 不会执行。</p>
+<h2 id="_4">示例：校验学习分钟数<a class="headerlink" href="#_4" title="链接到本节">&para;</a></h2>
+<div class="language-java highlight"><span class="filename">Main.java</span><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Main</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">    </span><span class="kd">static</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="nf">parseMinutes</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">text</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Integer</span><span class="p">.</span><span class="na">parseInt</span><span class="p">(</span><span class="n">text</span><span class="p">);</span>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">value</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">            </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">IllegalArgumentException</span><span class="p">(</span><span class="s">&quot;minutes must be positive&quot;</span><span class="p">);</span>
+</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="w">        </span><span class="p">}</span>
+</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">value</span><span class="p">;</span>
+</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="w">    </span><span class="p">}</span>
+</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>
+</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="w">        </span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">inputs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="s">&quot;30&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;abc&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;-5&quot;</span><span class="p">};</span>
+</span><span id="__span-2-12"><a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a><span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">input</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">inputs</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-2-13"><a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a><span class="w">            </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-2-14"><a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a><span class="w">                </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">&quot;Accepted: &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">parseMinutes</span><span class="p">(</span><span class="n">input</span><span class="p">));</span>
+</span><span id="__span-2-15"><a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a><span class="w">            </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">NumberFormatException</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-2-16"><a id="__codelineno-2-16" name="__codelineno-2-16" href="#__codelineno-2-16"></a><span class="w">                </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">&quot;Not a number: &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">input</span><span class="p">);</span>
+</span><span id="__span-2-17"><a id="__codelineno-2-17" name="__codelineno-2-17" href="#__codelineno-2-17"></a><span class="w">            </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">IllegalArgumentException</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-2-18"><a id="__codelineno-2-18" name="__codelineno-2-18" href="#__codelineno-2-18"></a><span class="w">                </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">&quot;Invalid value: &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">e</span><span class="p">.</span><span class="na">getMessage</span><span class="p">());</span>
+</span><span id="__span-2-19"><a id="__codelineno-2-19" name="__codelineno-2-19" href="#__codelineno-2-19"></a><span class="w">            </span><span class="p">}</span>
+</span><span id="__span-2-20"><a id="__codelineno-2-20" name="__codelineno-2-20" href="#__codelineno-2-20"></a><span class="w">        </span><span class="p">}</span>
+</span><span id="__span-2-21"><a id="__codelineno-2-21" name="__codelineno-2-21" href="#__codelineno-2-21"></a><span class="w">    </span><span class="p">}</span>
+</span><span id="__span-2-22"><a id="__codelineno-2-22" name="__codelineno-2-22" href="#__codelineno-2-22"></a><span class="p">}</span>
+</span></code></pre></div>
+<p><strong>输出：</strong></p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>Accepted: 30
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>Not a number: abc
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>Invalid value: minutes must be positive
+</span></code></pre></div>
+<p><code>NumberFormatException</code> 是 <code>IllegalArgumentException</code> 的子类。先捕获前者，才能为格式错误提供单独的提示；如果顺序颠倒，格式错误会落入更一般的分支。</p>
+<h2 id="_5">资源清理<a class="headerlink" href="#_5" title="链接到本节">&para;</a></h2>
+<p>实现 <code>AutoCloseable</code> 的资源可以交给 try-with-resources 管理：</p>
+<div class="language-java highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">try</span><span class="w"> </span><span class="p">(</span><span class="n">BufferedReader</span><span class="w"> </span><span class="n">reader</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Files</span><span class="p">.</span><span class="na">newBufferedReader</span><span class="p">(</span><span class="n">path</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">    </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">reader</span><span class="p">.</span><span class="na">readLine</span><span class="p">());</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="p">}</span>
+</span></code></pre></div>
+<p>退出语句块时会调用资源的 <code>close()</code>。多个资源按声明顺序的逆序关闭。如果主要操作与关闭操作都失败，关闭异常通常作为 suppressed exception 保留。</p>
+<h2 id="_6">自定义异常与异常传播<a class="headerlink" href="#_6" title="链接到本节">&para;</a></h2>
+<p>业务失败可以声明为自定义异常。是否使用受检异常，应根据调用方是否需要被强制要求处理这一情况决定：</p>
+<div class="language-java highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="kd">class</span> <span class="nc">InvalidMinutesException</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">IllegalArgumentException</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">    </span><span class="n">InvalidMinutesException</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">minutes</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">        </span><span class="kd">super</span><span class="p">(</span><span class="s">&quot;minutes out of range: &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">minutes</span><span class="p">);</span>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">    </span><span class="p">}</span>
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="p">}</span>
+</span></code></pre></div>
+<p>包装异常时可以保留原始原因：</p>
+<div class="language-java highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">IllegalStateException</span><span class="p">(</span><span class="s">&quot;Unable to load study records&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">cause</span><span class="p">);</span>
+</span></code></pre></div>
+<p>调用方能够恢复时就近处理；需要补充上下文时再包装并传播。仅记录日志后假装成功，会使后续代码难以判断操作是否完成。</p>
+<h2 id="_7">示例：记录学习时长<a class="headerlink" href="#_7" title="链接到本节">&para;</a></h2>
+<div class="language-java highlight"><span class="filename">Main.java</span><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="kd">class</span> <span class="nc">InvalidMinutesException</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">IllegalArgumentException</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="w">    </span><span class="n">InvalidMinutesException</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">minutes</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">        </span><span class="kd">super</span><span class="p">(</span><span class="s">&quot;minutes out of range: &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">minutes</span><span class="p">);</span>
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="w">    </span><span class="p">}</span>
+</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="p">}</span>
+</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a>
+</span><span id="__span-7-7"><a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Main</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-7-8"><a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a><span class="w">    </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">record</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">minutes</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-7-9"><a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a><span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">minutes</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">minutes</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">240</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-7-10"><a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a><span class="w">            </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">InvalidMinutesException</span><span class="p">(</span><span class="n">minutes</span><span class="p">);</span>
+</span><span id="__span-7-11"><a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a><span class="w">        </span><span class="p">}</span>
+</span><span id="__span-7-12"><a id="__codelineno-7-12" name="__codelineno-7-12" href="#__codelineno-7-12"></a><span class="w">    </span><span class="p">}</span>
+</span><span id="__span-7-13"><a id="__codelineno-7-13" name="__codelineno-7-13" href="#__codelineno-7-13"></a>
+</span><span id="__span-7-14"><a id="__codelineno-7-14" name="__codelineno-7-14" href="#__codelineno-7-14"></a><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-7-15"><a id="__codelineno-7-15" name="__codelineno-7-15" href="#__codelineno-7-15"></a><span class="w">        </span><span class="kt">int</span><span class="o">[]</span><span class="w"> </span><span class="n">inputs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="mi">30</span><span class="p">,</span><span class="w"> </span><span class="mi">300</span><span class="p">,</span><span class="w"> </span><span class="mi">45</span><span class="p">};</span>
+</span><span id="__span-7-16"><a id="__codelineno-7-16" name="__codelineno-7-16" href="#__codelineno-7-16"></a><span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">accepted</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+</span><span id="__span-7-17"><a id="__codelineno-7-17" name="__codelineno-7-17" href="#__codelineno-7-17"></a><span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">input</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">inputs</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-7-18"><a id="__codelineno-7-18" name="__codelineno-7-18" href="#__codelineno-7-18"></a><span class="w">            </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-7-19"><a id="__codelineno-7-19" name="__codelineno-7-19" href="#__codelineno-7-19"></a><span class="w">                </span><span class="kd">record</span><span class="err">(</span><span class="nc">input</span><span class="p">);</span>
+</span><span id="__span-7-20"><a id="__codelineno-7-20" name="__codelineno-7-20" href="#__codelineno-7-20"></a><span class="w">                </span><span class="n">accepted</span><span class="o">++</span><span class="p">;</span>
+</span><span id="__span-7-21"><a id="__codelineno-7-21" name="__codelineno-7-21" href="#__codelineno-7-21"></a><span class="w">            </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">InvalidMinutesException</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-7-22"><a id="__codelineno-7-22" name="__codelineno-7-22" href="#__codelineno-7-22"></a><span class="w">                </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">&quot;Rejected: &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">e</span><span class="p">.</span><span class="na">getMessage</span><span class="p">());</span>
+</span><span id="__span-7-23"><a id="__codelineno-7-23" name="__codelineno-7-23" href="#__codelineno-7-23"></a><span class="w">            </span><span class="p">}</span><span class="w"> </span><span class="k">finally</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-7-24"><a id="__codelineno-7-24" name="__codelineno-7-24" href="#__codelineno-7-24"></a><span class="w">                </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">&quot;Checked &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">input</span><span class="p">);</span>
+</span><span id="__span-7-25"><a id="__codelineno-7-25" name="__codelineno-7-25" href="#__codelineno-7-25"></a><span class="w">            </span><span class="p">}</span>
+</span><span id="__span-7-26"><a id="__codelineno-7-26" name="__codelineno-7-26" href="#__codelineno-7-26"></a><span class="w">        </span><span class="p">}</span>
+</span><span id="__span-7-27"><a id="__codelineno-7-27" name="__codelineno-7-27" href="#__codelineno-7-27"></a><span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">&quot;Accepted: &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">accepted</span><span class="p">);</span>
+</span><span id="__span-7-28"><a id="__codelineno-7-28" name="__codelineno-7-28" href="#__codelineno-7-28"></a><span class="w">    </span><span class="p">}</span>
+</span><span id="__span-7-29"><a id="__codelineno-7-29" name="__codelineno-7-29" href="#__codelineno-7-29"></a><span class="p">}</span>
+</span></code></pre></div>
+<p><strong>输出：</strong></p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>Checked 30
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>Rejected: minutes out of range: 300
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>Checked 300
+</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>Checked 45
+</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>Accepted: 2
+</span></code></pre></div>
+<p><code>record</code> 对超出 1—240 分钟的值抛出带有具体取值的自定义异常，调用方可以同时获得类型和上下文。无论 <code>try</code> 是否成功，<code>finally</code> 都会输出检查记录；<code>300</code> 被拒绝后 <code>accepted</code> 不增加，最终接受两条。</p>
+<h2 id="_8">注意事项<a class="headerlink" href="#_8" title="链接到本节">&para;</a></h2>
+<ul>
+<li>避免空的 <code>catch</code>，也不要无差别捕获所有 <code>Throwable</code>。</li>
+<li>不要在 <code>finally</code> 中使用 <code>return</code>，它可能覆盖原来的返回值或异常。</li>
+<li><code>finally</code> 不是在任何情况下都保证执行，例如进程被强制终止。</li>
+<li>捕获中断异常后，应合理传播中断，或恢复当前线程的中断标记。</li>
+<li>多异常捕获中用 <code>|</code> 连接的类型不能互为父子类型，否则无法编译。</li>
+<li>向调用方传播受检异常时，记得在方法声明中使用 <code>throws</code>。</li>
+</ul>
+<h2 id="_9">练习<a class="headerlink" href="#_9" title="链接到本节">&para;</a></h2>
+<ol>
+<li>为“校验学习分钟数”示例增加允许的最大时长 240 分钟，超过限制时抛出带有输入值的异常，并为 <code>"300"</code> 添加一条测试输入。</li>
+<li>给 <code>InvalidMinutesException</code> 增加一个携带原始原因 <code>Throwable cause</code> 的构造器，在包装其他异常时使用。</li>
+</ol>
+<h2 id="_10">参考资料<a class="headerlink" href="#_10" title="链接到本节">&para;</a></h2>
+<ul>
+<li><a href="https://www.tpointtech.com/exception-handling-in-java">Tpoint Tech：Exception Handling in Java</a>。</li>
+<li><a href="https://docs.oracle.com/javase/specs/jls/se21/html/jls-11.html">Java 21 语言规范：Exceptions</a>。</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>

@@ -1,0 +1,237 @@
+<article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+
+
+
+  
+  
+
+
+
+
+
+
+
+  <h1 id="_1">网络编程<a class="headerlink" href="#_1" title="链接到本节">&para;</a></h1>
+<p>网络编程使不同进程能够交换数据。Java 提供 Socket、数据报和 HTTP 客户端等 API；使用时既要选择协议，也要约定消息格式、字符编码、超时和资源释放方式。</p>
+<h2 id="_2">基本概念<a class="headerlink" href="#_2" title="链接到本节">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>概念</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>IP 地址</td>
+<td>标识网络接口或通信目标</td>
+</tr>
+<tr>
+<td>端口</td>
+<td>在主机上区分不同的通信端点</td>
+</tr>
+<tr>
+<td>TCP</td>
+<td>提供面向连接、可靠、有序的字节流</td>
+</tr>
+<tr>
+<td>UDP</td>
+<td>以数据报为单位发送，不保证送达或顺序</td>
+</tr>
+<tr>
+<td>HTTP</td>
+<td>规定请求、响应、方法、状态码和头部等应用层语义</td>
+</tr>
+</tbody>
+</table>
+<p>TCP 与 UDP 的主要区别：</p>
+<table>
+<thead>
+<tr>
+<th>比较项</th>
+<th>TCP</th>
+<th>UDP</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>连接</td>
+<td>建立连接后通信</td>
+<td>无连接，直接发送数据报</td>
+</tr>
+<tr>
+<td>可靠性</td>
+<td>保证按序送达，丢失自动重传</td>
+<td>可能丢失、重复或乱序</td>
+</tr>
+<tr>
+<td>边界</td>
+<td>字节流，没有消息边界</td>
+<td>保留数据报边界</td>
+</tr>
+<tr>
+<td>适用场景</td>
+<td>文件传输、HTTP、数据库连接</td>
+<td>实时音视频、游戏状态、DNS 查询</td>
+</tr>
+</tbody>
+</table>
+<p>TCP 不保留应用消息边界。一次写入不一定对应对端的一次读取，应用需要约定分隔符、固定长度或长度前缀等规则。</p>
+<h2 id="java-api">Java 网络 API<a class="headerlink" href="#java-api" title="链接到本节">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>API</th>
+<th>用途</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Socket</code></td>
+<td>建立 TCP 客户端连接，读写字节流</td>
+</tr>
+<tr>
+<td><code>ServerSocket</code></td>
+<td>监听并接受 TCP 连接</td>
+</tr>
+<tr>
+<td><code>DatagramSocket</code></td>
+<td>发送和接收 UDP 数据报</td>
+</tr>
+<tr>
+<td><code>URI</code></td>
+<td>表示和解析资源标识符</td>
+</tr>
+<tr>
+<td><code>HttpClient</code></td>
+<td>发送 HTTP 请求，获取响应或异步结果</td>
+</tr>
+</tbody>
+</table>
+<p>HTTP 业务通常可以先使用 <code>java.net.http.HttpClient</code>，只有需要直接控制传输过程时才下探到 Socket 等 API。</p>
+<p>常见网络异常：</p>
+<table>
+<thead>
+<tr>
+<th>异常</th>
+<th>常见触发</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>UnknownHostException</code></td>
+<td>主机名无法解析</td>
+</tr>
+<tr>
+<td><code>ConnectException</code></td>
+<td>目标拒绝连接或不可达</td>
+</tr>
+<tr>
+<td><code>SocketTimeoutException</code></td>
+<td>连接或读取超时</td>
+</tr>
+<tr>
+<td><code>MalformedURLException</code></td>
+<td>地址格式不符合规范</td>
+</tr>
+</tbody>
+</table>
+<h2 id="http">示例：访问本地 HTTP 服务<a class="headerlink" href="#http" title="链接到本节">&para;</a></h2>
+<p>为便于直接运行，下面的程序先用 JDK 自带的 <code>HttpServer</code> 启动一个本地服务，再用 <code>HttpClient</code> 发出请求。地址只绑定 <code>127.0.0.1</code>，端口由系统分配，不需要访问外部网站。</p>
+<div class="language-java highlight"><span class="filename">Main.java</span><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">com.sun.net.httpserver.HttpServer</span><span class="p">;</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="kn">import</span><span class="w"> </span><span class="nn">java.net.InetSocketAddress</span><span class="p">;</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="kn">import</span><span class="w"> </span><span class="nn">java.net.URI</span><span class="p">;</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="kn">import</span><span class="w"> </span><span class="nn">java.net.http.HttpClient</span><span class="p">;</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="kn">import</span><span class="w"> </span><span class="nn">java.net.http.HttpRequest</span><span class="p">;</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="kn">import</span><span class="w"> </span><span class="nn">java.net.http.HttpResponse</span><span class="p">;</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="kn">import</span><span class="w"> </span><span class="nn">java.nio.charset.StandardCharsets</span><span class="p">;</span>
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="kn">import</span><span class="w"> </span><span class="nn">java.time.Duration</span><span class="p">;</span>
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Main</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">Exception</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="w">        </span><span class="n">HttpServer</span><span class="w"> </span><span class="n">server</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">HttpServer</span><span class="p">.</span><span class="na">create</span><span class="p">(</span>
+</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="w">                </span><span class="k">new</span><span class="w"> </span><span class="n">InetSocketAddress</span><span class="p">(</span><span class="s">&quot;127.0.0.1&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">),</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span>
+</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="w">        </span><span class="n">server</span><span class="p">.</span><span class="na">createContext</span><span class="p">(</span><span class="s">&quot;/topic&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">exchange</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a><span class="w">            </span><span class="kt">byte</span><span class="o">[]</span><span class="w"> </span><span class="n">body</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;Java networking&quot;</span><span class="p">.</span><span class="na">getBytes</span><span class="p">(</span><span class="n">StandardCharsets</span><span class="p">.</span><span class="na">UTF_8</span><span class="p">);</span>
+</span><span id="__span-0-16"><a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a><span class="w">            </span><span class="n">exchange</span><span class="p">.</span><span class="na">getResponseHeaders</span><span class="p">().</span><span class="na">set</span><span class="p">(</span><span class="s">&quot;Content-Type&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;text/plain; charset=UTF-8&quot;</span><span class="p">);</span>
+</span><span id="__span-0-17"><a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a><span class="w">            </span><span class="n">exchange</span><span class="p">.</span><span class="na">sendResponseHeaders</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span><span class="w"> </span><span class="n">body</span><span class="p">.</span><span class="na">length</span><span class="p">);</span>
+</span><span id="__span-0-18"><a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a><span class="w">            </span><span class="k">try</span><span class="w"> </span><span class="p">(</span><span class="kd">var</span><span class="w"> </span><span class="n">output</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">exchange</span><span class="p">.</span><span class="na">getResponseBody</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-0-19"><a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a><span class="w">                </span><span class="n">output</span><span class="p">.</span><span class="na">write</span><span class="p">(</span><span class="n">body</span><span class="p">);</span>
+</span><span id="__span-0-20"><a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a><span class="w">            </span><span class="p">}</span><span class="w"> </span><span class="k">finally</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-0-21"><a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a><span class="w">                </span><span class="n">exchange</span><span class="p">.</span><span class="na">close</span><span class="p">();</span>
+</span><span id="__span-0-22"><a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a><span class="w">            </span><span class="p">}</span>
+</span><span id="__span-0-23"><a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a><span class="w">        </span><span class="p">});</span>
+</span><span id="__span-0-24"><a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a><span class="w">        </span><span class="n">server</span><span class="p">.</span><span class="na">start</span><span class="p">();</span>
+</span><span id="__span-0-25"><a id="__codelineno-0-25" name="__codelineno-0-25" href="#__codelineno-0-25"></a>
+</span><span id="__span-0-26"><a id="__codelineno-0-26" name="__codelineno-0-26" href="#__codelineno-0-26"></a><span class="w">        </span><span class="k">try</span><span class="w"> </span><span class="p">(</span><span class="n">HttpClient</span><span class="w"> </span><span class="n">client</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">HttpClient</span><span class="p">.</span><span class="na">newBuilder</span><span class="p">()</span>
+</span><span id="__span-0-27"><a id="__codelineno-0-27" name="__codelineno-0-27" href="#__codelineno-0-27"></a><span class="w">                </span><span class="p">.</span><span class="na">connectTimeout</span><span class="p">(</span><span class="n">Duration</span><span class="p">.</span><span class="na">ofSeconds</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span>
+</span><span id="__span-0-28"><a id="__codelineno-0-28" name="__codelineno-0-28" href="#__codelineno-0-28"></a><span class="w">                </span><span class="p">.</span><span class="na">build</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-0-29"><a id="__codelineno-0-29" name="__codelineno-0-29" href="#__codelineno-0-29"></a><span class="w">            </span><span class="n">URI</span><span class="w"> </span><span class="n">uri</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">URI</span><span class="p">.</span><span class="na">create</span><span class="p">(</span><span class="s">&quot;http://127.0.0.1:&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">server</span><span class="p">.</span><span class="na">getAddress</span><span class="p">().</span><span class="na">getPort</span><span class="p">()</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">&quot;/topic&quot;</span><span class="p">);</span>
+</span><span id="__span-0-30"><a id="__codelineno-0-30" name="__codelineno-0-30" href="#__codelineno-0-30"></a><span class="w">            </span><span class="n">HttpRequest</span><span class="w"> </span><span class="n">request</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">HttpRequest</span><span class="p">.</span><span class="na">newBuilder</span><span class="p">(</span><span class="n">uri</span><span class="p">)</span>
+</span><span id="__span-0-31"><a id="__codelineno-0-31" name="__codelineno-0-31" href="#__codelineno-0-31"></a><span class="w">                    </span><span class="p">.</span><span class="na">timeout</span><span class="p">(</span><span class="n">Duration</span><span class="p">.</span><span class="na">ofSeconds</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span>
+</span><span id="__span-0-32"><a id="__codelineno-0-32" name="__codelineno-0-32" href="#__codelineno-0-32"></a><span class="w">                    </span><span class="p">.</span><span class="na">GET</span><span class="p">()</span>
+</span><span id="__span-0-33"><a id="__codelineno-0-33" name="__codelineno-0-33" href="#__codelineno-0-33"></a><span class="w">                    </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
+</span><span id="__span-0-34"><a id="__codelineno-0-34" name="__codelineno-0-34" href="#__codelineno-0-34"></a><span class="w">            </span><span class="n">HttpResponse</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span><span class="w"> </span><span class="n">response</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">client</span><span class="p">.</span><span class="na">send</span><span class="p">(</span>
+</span><span id="__span-0-35"><a id="__codelineno-0-35" name="__codelineno-0-35" href="#__codelineno-0-35"></a><span class="w">                    </span><span class="n">request</span><span class="p">,</span><span class="w"> </span><span class="n">HttpResponse</span><span class="p">.</span><span class="na">BodyHandlers</span><span class="p">.</span><span class="na">ofString</span><span class="p">(</span><span class="n">StandardCharsets</span><span class="p">.</span><span class="na">UTF_8</span><span class="p">));</span>
+</span><span id="__span-0-36"><a id="__codelineno-0-36" name="__codelineno-0-36" href="#__codelineno-0-36"></a>
+</span><span id="__span-0-37"><a id="__codelineno-0-37" name="__codelineno-0-37" href="#__codelineno-0-37"></a><span class="w">            </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">&quot;Status: &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">response</span><span class="p">.</span><span class="na">statusCode</span><span class="p">());</span>
+</span><span id="__span-0-38"><a id="__codelineno-0-38" name="__codelineno-0-38" href="#__codelineno-0-38"></a><span class="w">            </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">&quot;Body: &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">response</span><span class="p">.</span><span class="na">body</span><span class="p">());</span>
+</span><span id="__span-0-39"><a id="__codelineno-0-39" name="__codelineno-0-39" href="#__codelineno-0-39"></a><span class="w">        </span><span class="p">}</span><span class="w"> </span><span class="k">finally</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-0-40"><a id="__codelineno-0-40" name="__codelineno-0-40" href="#__codelineno-0-40"></a><span class="w">            </span><span class="n">server</span><span class="p">.</span><span class="na">stop</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+</span><span id="__span-0-41"><a id="__codelineno-0-41" name="__codelineno-0-41" href="#__codelineno-0-41"></a><span class="w">        </span><span class="p">}</span>
+</span><span id="__span-0-42"><a id="__codelineno-0-42" name="__codelineno-0-42" href="#__codelineno-0-42"></a><span class="w">    </span><span class="p">}</span>
+</span><span id="__span-0-43"><a id="__codelineno-0-43" name="__codelineno-0-43" href="#__codelineno-0-43"></a><span class="p">}</span>
+</span></code></pre></div>
+<p><strong>输出：</strong></p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>Status: 200
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>Body: Java networking
+</span></code></pre></div>
+<p><code>connectTimeout</code> 约束新连接的建立过程，请求上的 <code>timeout</code> 约束该请求等待响应的时间。它们不是完全相同的概念。<code>send</code> 同步等待响应，<code>sendAsync</code> 则返回 <code>CompletableFuture</code>。</p>
+<p><code>HttpServer</code> 属于 JDK 的 <code>jdk.httpserver</code> 模块；使用自行裁剪的运行时时，需要包含该模块。本例用于解释请求与响应，完整 Web 应用可以进一步使用<a href="../../framework/overview/">框架</a>。</p>
+<h2 id="socket">Socket 中的消息边界<a class="headerlink" href="#socket" title="链接到本节">&para;</a></h2>
+<p>若约定一行文本是一条消息，发送方需要写入换行并刷新缓冲，接收方才能用 <code>readLine()</code> 读取整行：</p>
+<div class="language-java highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">writer</span><span class="p">.</span><span class="na">write</span><span class="p">(</span><span class="s">&quot;Java\n&quot;</span><span class="p">);</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="n">writer</span><span class="p">.</span><span class="na">flush</span><span class="p">();</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="n">String</span><span class="w"> </span><span class="n">message</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">reader</span><span class="p">.</span><span class="na">readLine</span><span class="p">();</span>
+</span></code></pre></div>
+<p>这段代码假定双方采用一致的编码和行分隔规则。接收方还应处理提前断开、超长消息和读取超时，不能把一次 <code>read()</code> 当作完整消息。</p>
+<h2 id="_3">注意事项<a class="headerlink" href="#_3" title="链接到本节">&para;</a></h2>
+<ul>
+<li>HTTP 的 4xx、5xx 状态不一定表现为 Java 异常，需要检查状态码。</li>
+<li>阻塞式 Socket 应分别考虑连接超时和读取超时，资源使用完及时关闭。</li>
+<li>对请求设置重试前，应判断操作是否可以安全重复执行。</li>
+<li>公网请求使用 HTTPS 时应保持证书验证，并正确处理重定向和认证信息。</li>
+<li>UDP 不保证送达，重要数据需要应用层自行确认和重传。</li>
+</ul>
+<h2 id="_4">练习<a class="headerlink" href="#_4" title="链接到本节">&para;</a></h2>
+<ol>
+<li>为本地服务增加 <code>/missing</code> 路径并返回 404，修改客户端输出，让它根据状态码区分成功与失败。再把同步 <code>send</code> 改为 <code>sendAsync</code>，比较两种调用方式。</li>
+<li>为示例的 HTTP 响应增加 <code>GET /topic?name=Java</code> 的查询参数处理，让服务端按参数返回不同的内容。</li>
+</ol>
+<h2 id="_5">参考资料<a class="headerlink" href="#_5" title="链接到本节">&para;</a></h2>
+<ul>
+<li><a href="https://www.tpointtech.com/java-networking">Tpoint Tech：Java Networking</a>。</li>
+<li><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.net.http/java/net/http/HttpClient.html">Java 21 API：HttpClient</a>。</li>
+<li><a href="https://docs.oracle.com/en/java/javase/21/docs/api/jdk.httpserver/com/sun/net/httpserver/HttpServer.html">Java 21 API：HttpServer</a>。</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>

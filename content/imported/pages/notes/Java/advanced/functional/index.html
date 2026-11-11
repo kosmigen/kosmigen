@@ -1,0 +1,315 @@
+<article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+
+
+
+  
+  
+
+
+
+
+
+
+
+  <h1 id="_1">函数式编程<a class="headerlink" href="#_1" title="链接到本节">&para;</a></h1>
+<p>Java 支持通过函数式接口传递行为。Lambda 和方法引用简化了这种写法，Stream 则把筛选、转换和汇总等操作组合成数据处理流水线。</p>
+<h2 id="_2">函数式接口<a class="headerlink" href="#_2" title="链接到本节">&para;</a></h2>
+<p>函数式接口具有一个符合规则的抽象方法。<code>@FunctionalInterface</code> 可以让编译器检查这个约定；接口仍可以包含默认方法和静态方法。</p>
+<table>
+<thead>
+<tr>
+<th>接口</th>
+<th>典型用途</th>
+<th>核心方法</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Predicate&lt;T&gt;</code></td>
+<td>判断元素是否符合条件</td>
+<td><code>test</code></td>
+</tr>
+<tr>
+<td><code>Function&lt;T, R&gt;</code></td>
+<td>把输入转换为结果</td>
+<td><code>apply</code></td>
+</tr>
+<tr>
+<td><code>Consumer&lt;T&gt;</code></td>
+<td>消费一个值</td>
+<td><code>accept</code></td>
+</tr>
+<tr>
+<td><code>Supplier&lt;T&gt;</code></td>
+<td>提供一个值</td>
+<td><code>get</code></td>
+</tr>
+</tbody>
+</table>
+<p>二元版本 <code>BiFunction&lt;T, U, R&gt;</code>、<code>BiConsumer&lt;T, U&gt;</code> 接收两个参数；<code>UnaryOperator&lt;T&gt;</code>、<code>BinaryOperator&lt;T&gt;</code> 是输入输出同类型的 <code>Function</code> 和 <code>BiFunction</code> 特化。</p>
+<h2 id="lambda">Lambda 与方法引用<a class="headerlink" href="#lambda" title="链接到本节">&para;</a></h2>
+<p><strong>语法：</strong></p>
+<div class="language-java highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="p">()</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">表达式</span><span class="w">                     </span><span class="c1">// 无参数</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="n">name</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">表达式</span><span class="w">                   </span><span class="c1">// 单参数可以省略括号</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">(</span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">score</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">表达式</span><span class="w">          </span><span class="c1">// 多参数</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="p">(</span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">score</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">语句块</span><span class="p">;</span><span class="w"> </span><span class="p">}</span><span class="w">     </span><span class="c1">// 语句块形式，需要返回值时使用 return</span>
+</span></code></pre></div>
+<p>Lambda 的目标类型由上下文推断，通常是把 Lambda 赋值给函数式接口变量，或作为参数传给接收函数式接口的方法。</p>
+<p>方法引用是 Lambda 的简写形式：</p>
+<table>
+<thead>
+<tr>
+<th>形式</th>
+<th>示例</th>
+<th>等价的 Lambda</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>静态方法</td>
+<td><code>String::valueOf</code></td>
+<td><code>x -&gt; String.valueOf(x)</code></td>
+</tr>
+<tr>
+<td>特定对象的方法</td>
+<td><code>System.out::println</code></td>
+<td><code>x -&gt; System.out.println(x)</code></td>
+</tr>
+<tr>
+<td>任意对象的方法</td>
+<td><code>String::length</code></td>
+<td><code>s -&gt; s.length()</code></td>
+</tr>
+<tr>
+<td>构造器</td>
+<td><code>ArrayList::new</code></td>
+<td><code>() -&gt; new ArrayList&lt;&gt;()</code></td>
+</tr>
+</tbody>
+</table>
+<p>Lambda 捕获的局部变量必须是 <code>final</code> 或实际不再重新赋值的变量。这不意味着被引用对象的内容也不可修改。</p>
+<h2 id="stream">Stream 流水线<a class="headerlink" href="#stream" title="链接到本节">&para;</a></h2>
+<p>Stream 本身不保存一份新的数据集合，它描述对数据源执行的操作。</p>
+<table>
+<thead>
+<tr>
+<th>阶段</th>
+<th>示例</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>创建流</td>
+<td><code>list.stream()</code></td>
+<td>从数据源建立流水线</td>
+</tr>
+<tr>
+<td>中间操作</td>
+<td><code>filter</code>、<code>map</code>、<code>sorted</code></td>
+<td>继续返回流，通常惰性执行</td>
+</tr>
+<tr>
+<td>终止操作</td>
+<td><code>toList</code>、<code>count</code>、<code>reduce</code></td>
+<td>触发处理并产生结果或副作用</td>
+</tr>
+</tbody>
+</table>
+<p>常用中间操作：</p>
+<table>
+<thead>
+<tr>
+<th>操作</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>filter</code></td>
+<td>保留符合条件的元素</td>
+</tr>
+<tr>
+<td><code>map</code></td>
+<td>把元素转换为另一种值</td>
+</tr>
+<tr>
+<td><code>flatMap</code></td>
+<td>把每个元素展开为流后合并</td>
+</tr>
+<tr>
+<td><code>distinct</code></td>
+<td>去重</td>
+</tr>
+<tr>
+<td><code>sorted</code></td>
+<td>按自然顺序或给定 <code>Comparator</code> 排序</td>
+</tr>
+<tr>
+<td><code>limit</code>、<code>skip</code></td>
+<td>截取前若干个或跳过前若干个</td>
+</tr>
+</tbody>
+</table>
+<p>常用终止操作：</p>
+<table>
+<thead>
+<tr>
+<th>操作</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>forEach</code></td>
+<td>对每个元素执行副作用</td>
+</tr>
+<tr>
+<td><code>count</code></td>
+<td>统计元素数量</td>
+</tr>
+<tr>
+<td><code>toList</code></td>
+<td>收集为不可修改的列表</td>
+</tr>
+<tr>
+<td><code>collect</code></td>
+<td>按收集器规则收集，如 <code>Collectors.groupingBy</code></td>
+</tr>
+<tr>
+<td><code>reduce</code></td>
+<td>按函数把元素合并为一个结果</td>
+</tr>
+<tr>
+<td><code>anyMatch</code>、<code>allMatch</code>、<code>noneMatch</code></td>
+<td>检查是否有元素符合条件</td>
+</tr>
+<tr>
+<td><code>findFirst</code>、<code>findAny</code></td>
+<td>取出一个元素，结果为 <code>Optional</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="_3">示例：筛选并整理课程名称<a class="headerlink" href="#_3" title="链接到本节">&para;</a></h2>
+<div class="language-java highlight"><span class="filename">Main.java</span><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">java.util.List</span><span class="p">;</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="kn">import</span><span class="w"> </span><span class="nn">java.util.function.Predicate</span><span class="p">;</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Main</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">        </span><span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span><span class="w"> </span><span class="n">topics</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">List</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="s">&quot; Java &quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;IO&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Collections&quot;</span><span class="p">);</span>
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="w">        </span><span class="n">Predicate</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span><span class="w"> </span><span class="n">longEnough</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">name</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">name</span><span class="p">.</span><span class="na">length</span><span class="p">()</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mi">4</span><span class="p">;</span>
+</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>
+</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="w">        </span><span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">topics</span><span class="p">.</span><span class="na">stream</span><span class="p">()</span>
+</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="w">                </span><span class="p">.</span><span class="na">map</span><span class="p">(</span><span class="n">String</span><span class="p">::</span><span class="n">strip</span><span class="p">)</span>
+</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="w">                </span><span class="p">.</span><span class="na">filter</span><span class="p">(</span><span class="n">longEnough</span><span class="p">)</span>
+</span><span id="__span-1-12"><a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a><span class="w">                </span><span class="p">.</span><span class="na">sorted</span><span class="p">()</span>
+</span><span id="__span-1-13"><a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a><span class="w">                </span><span class="p">.</span><span class="na">toList</span><span class="p">();</span>
+</span><span id="__span-1-14"><a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a>
+</span><span id="__span-1-15"><a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a><span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">result</span><span class="p">);</span>
+</span><span id="__span-1-16"><a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a><span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">&quot;Count: &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">result</span><span class="p">.</span><span class="na">size</span><span class="p">());</span>
+</span><span id="__span-1-17"><a id="__codelineno-1-17" name="__codelineno-1-17" href="#__codelineno-1-17"></a><span class="w">    </span><span class="p">}</span>
+</span><span id="__span-1-18"><a id="__codelineno-1-18" name="__codelineno-1-18" href="#__codelineno-1-18"></a><span class="p">}</span>
+</span></code></pre></div>
+<p><strong>输出：</strong></p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>[Collections, Java]
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>Count: 2
+</span></code></pre></div>
+<p><code>map</code> 清理名称，<code>filter</code> 筛选长度，<code>sorted</code> 排序，<code>toList</code> 收集结果。Java 21 中的 <code>Stream.toList()</code> 返回不可修改的列表。</p>
+<h2 id="_4">汇总与分组<a class="headerlink" href="#_4" title="链接到本节">&para;</a></h2>
+<p>数值计算可以先转换为基本类型流，再调用 <code>sum()</code> 等方法。需要按条件分组时，可以使用 <code>Collectors.groupingBy</code>：</p>
+<div class="language-java highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kt">int</span><span class="w"> </span><span class="n">totalLength</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">topics</span><span class="p">.</span><span class="na">stream</span><span class="p">().</span><span class="na">mapToInt</span><span class="p">(</span><span class="n">String</span><span class="p">::</span><span class="n">length</span><span class="p">).</span><span class="na">sum</span><span class="p">();</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="n">Map</span><span class="o">&lt;</span><span class="n">Integer</span><span class="p">,</span><span class="w"> </span><span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">byLength</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">topics</span><span class="p">.</span><span class="na">stream</span><span class="p">()</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">        </span><span class="p">.</span><span class="na">collect</span><span class="p">(</span><span class="n">Collectors</span><span class="p">.</span><span class="na">groupingBy</span><span class="p">(</span><span class="n">String</span><span class="p">::</span><span class="n">length</span><span class="p">));</span>
+</span></code></pre></div>
+<p>以上是片段，需要导入 <code>Map</code> 和 <code>Collectors</code>。分组结果的遍历顺序取决于使用的映射实现。</p>
+<p><code>reduce</code> 把元素逐个合并为单一结果：</p>
+<div class="language-java highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">Optional</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span><span class="w"> </span><span class="n">total</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">List</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="mi">25</span><span class="p">,</span><span class="w"> </span><span class="mi">40</span><span class="p">,</span><span class="w"> </span><span class="mi">30</span><span class="p">).</span><span class="na">stream</span><span class="p">()</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">        </span><span class="p">.</span><span class="na">reduce</span><span class="p">(</span><span class="n">Integer</span><span class="p">::</span><span class="n">sum</span><span class="p">);</span>
+</span></code></pre></div>
+<p>空流的 <code>reduce</code> 返回空 <code>Optional</code>；带初始值的形式可以直接返回结果。</p>
+<h2 id="optional">Optional 与缺失值<a class="headerlink" href="#optional" title="链接到本节">&para;</a></h2>
+<p><code>Optional</code> 表示一个可能存在也可能不存在的值，避免把 <code>null</code> 当作有效结果传递：</p>
+<div class="language-java highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">Optional</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span><span class="w"> </span><span class="n">first</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">topics</span><span class="p">.</span><span class="na">stream</span><span class="p">().</span><span class="na">findFirst</span><span class="p">();</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="n">String</span><span class="w"> </span><span class="n">value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">first</span><span class="p">.</span><span class="na">orElse</span><span class="p">(</span><span class="s">&quot;none&quot;</span><span class="p">);</span>
+</span></code></pre></div>
+<p><code>orElseGet</code> 只在值不存在时才计算默认值，<code>ifPresent</code> 只在值存在时执行操作。<code>Optional</code> 适合表达方法的返回类型，不宜作为字段或参数类型使用。</p>
+<h2 id="_5">示例：学生成绩统计<a class="headerlink" href="#_5" title="链接到本节">&para;</a></h2>
+<div class="language-java highlight"><span class="filename">Main.java</span><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">java.util.List</span><span class="p">;</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="kn">import</span><span class="w"> </span><span class="nn">java.util.Map</span><span class="p">;</span>
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="kn">import</span><span class="w"> </span><span class="nn">java.util.TreeMap</span><span class="p">;</span>
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="kn">import</span><span class="w"> </span><span class="nn">java.util.stream.Collectors</span><span class="p">;</span>
+</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>
+</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Main</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="w">    </span><span class="kd">record</span> <span class="nc">Student</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">score</span><span class="p">)</span><span class="w"> </span><span class="p">{}</span>
+</span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a>
+</span><span id="__span-6-9"><a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-6-10"><a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a><span class="w">        </span><span class="n">List</span><span class="o">&lt;</span><span class="n">Student</span><span class="o">&gt;</span><span class="w"> </span><span class="n">students</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">List</span><span class="p">.</span><span class="na">of</span><span class="p">(</span>
+</span><span id="__span-6-11"><a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a><span class="w">                </span><span class="k">new</span><span class="w"> </span><span class="n">Student</span><span class="p">(</span><span class="s">&quot;Alex&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">95</span><span class="p">),</span>
+</span><span id="__span-6-12"><a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a><span class="w">                </span><span class="k">new</span><span class="w"> </span><span class="n">Student</span><span class="p">(</span><span class="s">&quot;Bo&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">88</span><span class="p">),</span>
+</span><span id="__span-6-13"><a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a><span class="w">                </span><span class="k">new</span><span class="w"> </span><span class="n">Student</span><span class="p">(</span><span class="s">&quot;Cindy&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">82</span><span class="p">),</span>
+</span><span id="__span-6-14"><a id="__codelineno-6-14" name="__codelineno-6-14" href="#__codelineno-6-14"></a><span class="w">                </span><span class="k">new</span><span class="w"> </span><span class="n">Student</span><span class="p">(</span><span class="s">&quot;Dana&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">91</span><span class="p">)</span>
+</span><span id="__span-6-15"><a id="__codelineno-6-15" name="__codelineno-6-15" href="#__codelineno-6-15"></a><span class="w">        </span><span class="p">);</span>
+</span><span id="__span-6-16"><a id="__codelineno-6-16" name="__codelineno-6-16" href="#__codelineno-6-16"></a>
+</span><span id="__span-6-17"><a id="__codelineno-6-17" name="__codelineno-6-17" href="#__codelineno-6-17"></a><span class="w">        </span><span class="kt">double</span><span class="w"> </span><span class="n">average</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">students</span><span class="p">.</span><span class="na">stream</span><span class="p">()</span>
+</span><span id="__span-6-18"><a id="__codelineno-6-18" name="__codelineno-6-18" href="#__codelineno-6-18"></a><span class="w">                </span><span class="p">.</span><span class="na">mapToInt</span><span class="p">(</span><span class="n">Student</span><span class="p">::</span><span class="n">score</span><span class="p">)</span>
+</span><span id="__span-6-19"><a id="__codelineno-6-19" name="__codelineno-6-19" href="#__codelineno-6-19"></a><span class="w">                </span><span class="p">.</span><span class="na">average</span><span class="p">()</span>
+</span><span id="__span-6-20"><a id="__codelineno-6-20" name="__codelineno-6-20" href="#__codelineno-6-20"></a><span class="w">                </span><span class="p">.</span><span class="na">orElse</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+</span><span id="__span-6-21"><a id="__codelineno-6-21" name="__codelineno-6-21" href="#__codelineno-6-21"></a>
+</span><span id="__span-6-22"><a id="__codelineno-6-22" name="__codelineno-6-22" href="#__codelineno-6-22"></a><span class="w">        </span><span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="p">,</span><span class="w"> </span><span class="n">List</span><span class="o">&lt;</span><span class="n">Student</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">byGrade</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">students</span><span class="p">.</span><span class="na">stream</span><span class="p">()</span>
+</span><span id="__span-6-23"><a id="__codelineno-6-23" name="__codelineno-6-23" href="#__codelineno-6-23"></a><span class="w">                </span><span class="p">.</span><span class="na">collect</span><span class="p">(</span><span class="n">Collectors</span><span class="p">.</span><span class="na">groupingBy</span><span class="p">(</span>
+</span><span id="__span-6-24"><a id="__codelineno-6-24" name="__codelineno-6-24" href="#__codelineno-6-24"></a><span class="w">                        </span><span class="n">student</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">student</span><span class="p">.</span><span class="na">score</span><span class="p">()</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mi">90</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="s">&quot;A&quot;</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s">&quot;B&quot;</span><span class="p">,</span>
+</span><span id="__span-6-25"><a id="__codelineno-6-25" name="__codelineno-6-25" href="#__codelineno-6-25"></a><span class="w">                        </span><span class="n">TreeMap</span><span class="p">::</span><span class="k">new</span><span class="p">,</span>
+</span><span id="__span-6-26"><a id="__codelineno-6-26" name="__codelineno-6-26" href="#__codelineno-6-26"></a><span class="w">                        </span><span class="n">Collectors</span><span class="p">.</span><span class="na">toList</span><span class="p">()));</span>
+</span><span id="__span-6-27"><a id="__codelineno-6-27" name="__codelineno-6-27" href="#__codelineno-6-27"></a>
+</span><span id="__span-6-28"><a id="__codelineno-6-28" name="__codelineno-6-28" href="#__codelineno-6-28"></a><span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">&quot;Average: &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">average</span><span class="p">);</span>
+</span><span id="__span-6-29"><a id="__codelineno-6-29" name="__codelineno-6-29" href="#__codelineno-6-29"></a><span class="w">        </span><span class="n">byGrade</span><span class="p">.</span><span class="na">forEach</span><span class="p">((</span><span class="n">grade</span><span class="p">,</span><span class="w"> </span><span class="n">members</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span>
+</span><span id="__span-6-30"><a id="__codelineno-6-30" name="__codelineno-6-30" href="#__codelineno-6-30"></a><span class="w">                </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">grade</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">&quot;: &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">members</span><span class="p">.</span><span class="na">stream</span><span class="p">().</span><span class="na">map</span><span class="p">(</span><span class="n">Student</span><span class="p">::</span><span class="n">name</span><span class="p">).</span><span class="na">toList</span><span class="p">()));</span>
+</span><span id="__span-6-31"><a id="__codelineno-6-31" name="__codelineno-6-31" href="#__codelineno-6-31"></a><span class="w">    </span><span class="p">}</span>
+</span><span id="__span-6-32"><a id="__codelineno-6-32" name="__codelineno-6-32" href="#__codelineno-6-32"></a><span class="p">}</span>
+</span></code></pre></div>
+<p><strong>输出：</strong></p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>Average: 89.0
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>A: [Alex, Dana]
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>B: [Bo, Cindy]
+</span></code></pre></div>
+<p><code>mapToInt</code> 把对象流转换为 <code>IntStream</code>，<code>average</code> 返回 <code>OptionalDouble</code>，空流时 <code>orElse(0)</code> 提供默认值。<code>groupingBy</code> 按分数线分成两组，显式传入 <code>TreeMap::new</code> 让分组的输出顺序固定，而不是依赖 <code>HashMap</code> 的遍历顺序。<code>record</code> 的写法见<a href="../../basics/oop/">面向对象</a>。</p>
+<h2 id="_6">注意事项<a class="headerlink" href="#_6" title="链接到本节">&para;</a></h2>
+<ul>
+<li>一个 Stream 只能消费一次，需要再次计算时重新创建流。</li>
+<li>流中的函数应尽量不修改数据源，也不依赖不断变化的外部状态。</li>
+<li><code>parallelStream()</code> 不保证更快，阻塞操作、共享状态和任务规模都会影响结果。</li>
+<li><code>Files.lines()</code> 等持有外部资源的流需要关闭；普通集合生成的流通常不需要。</li>
+<li>Lambda 的 <code>this</code> 指向外层对象，与匿名内部类指向匿名类自身不同。</li>
+</ul>
+<h2 id="_7">练习<a class="headerlink" href="#_7" title="链接到本节">&para;</a></h2>
+<ol>
+<li>为课程列表增加重复项，清理空白后使用 <code>distinct()</code> 去重，再按名称长度排序。为长度相同的名称补充一个明确的排序规则。</li>
+<li>用 <code>reduce</code> 计算一组学习分钟数的总和，并比较带初始值与不带初始值两种写法的结果类型。</li>
+</ol>
+<h2 id="_8">参考资料<a class="headerlink" href="#_8" title="链接到本节">&para;</a></h2>
+<ul>
+<li><a href="https://www.tpointtech.com/java-lambda-expressions">Tpoint Tech：Java Lambda Expressions</a>。</li>
+<li><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/stream/Stream.html">Java 21 API：Stream</a>。</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>

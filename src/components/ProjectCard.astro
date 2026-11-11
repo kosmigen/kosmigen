@@ -1,0 +1,19 @@
+---
+import type { Project } from '../lib/content';
+const { project } = Astro.props as { project: Project };
+const preview = 'https://image.thum.io/get/width/1200/crop/750/noanimate/?url=' + encodeURIComponent(project.url);
+---
+<wa-card class="kb-project-card" id={project.id} role="article" aria-labelledby={project.id + '-title'} appearance="outlined" with-media with-footer>
+  <div class="kb-project-card__preview" slot="media" data-preview-state="loading" aria-busy="true">
+    <span class="kb-project-card__preview-message" role="status">首页预览加载中…</span>
+    <img src={preview} alt={project.name + ' 网站首页预览'} width="1200" height="750" loading="lazy" decoding="async" referrerpolicy="no-referrer" />
+  </div>
+  <div class="kb-project-card__heading">
+    <h2 id={project.id + '-title'}>{project.name}</h2>
+    {project.status && <wa-badge variant="neutral" appearance="outlined" pill>{project.status}</wa-badge>}
+    <p class="kb-project-card__description">{project.description}</p>
+  </div>
+  <a class="kb-project-card__visit" slot="footer" href={project.url} target="_blank" rel="noopener noreferrer" aria-label={`前往 ${project.name} 网站（新窗口打开）`}>
+    前往网站 <span aria-hidden="true">↗</span>
+  </a>
+</wa-card>

@@ -1,0 +1,392 @@
+<article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+
+
+
+  
+  
+
+
+
+
+
+
+
+  <h1 id="java">Java 概述<a class="headerlink" href="#java" title="链接到本节">&para;</a></h1>
+<p>本页汇总 Java 的语言定位与入门概念：教程如何组织、语言有哪些主要特性、与 C++ 的区别、数据类型、字符编码和运算符。语言的由来、第一个程序以及 JDK、JRE、JVM 的关系见 <a href="../intro/">Java</a>。</p>
+<h2 id="java_1">Java 教程概览<a class="headerlink" href="#java_1" title="链接到本节">&para;</a></h2>
+<p>Java 教程通常按以下顺序展开，对应本栏目的分类：</p>
+<table>
+<thead>
+<tr>
+<th>教程阶段</th>
+<th>主要内容</th>
+<th>对应栏目</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>入门</td>
+<td>历史、特性、环境与第一个程序</td>
+<td><a href="../intro/">Java</a>、本页</td>
+</tr>
+<tr>
+<td>语言基础</td>
+<td>数据类型、变量、运算符、流程控制</td>
+<td><a href="../basics/syntax/">核心：基本语法</a>等</td>
+</tr>
+<tr>
+<td>面向对象</td>
+<td>类、继承、多态、抽象与封装</td>
+<td><a href="../basics/oop/">核心：面向对象</a></td>
+</tr>
+<tr>
+<td>标准库</td>
+<td>字符串、集合、异常、IO</td>
+<td><a href="../basics/overview/">核心知识</a></td>
+</tr>
+<tr>
+<td>进阶机制</td>
+<td>反射、并发、网络、JVM</td>
+<td><a href="../advanced/overview/">进阶</a></td>
+</tr>
+<tr>
+<td>应用开发</td>
+<td>框架与第三方库</td>
+<td><a href="../framework/overview/">框架</a>、<a href="../third-party/overview/">第三方库</a></td>
+</tr>
+</tbody>
+</table>
+<h2 id="java_2">Java 的主要特性<a class="headerlink" href="#java_2" title="链接到本节">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>特性</th>
+<th>含义</th>
+<th>实际情况</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>简单</td>
+<td>语法接近 C++，去掉了指针、运算符重载等</td>
+<td>上手容易，但仍需理解静态类型和类结构</td>
+</tr>
+<tr>
+<td>面向对象</td>
+<td>以类和对象组织数据与行为</td>
+<td>基本类型等少数值不是对象</td>
+</tr>
+<tr>
+<td>可移植、平台无关</td>
+<td>编译为字节码，由各平台的 JVM 执行</td>
+<td>JVM 本身按平台实现；原生依赖、路径等仍需注意</td>
+</tr>
+<tr>
+<td>安全</td>
+<td>不暴露指针，运行时校验字节码，类加载器隔离来源</td>
+<td><code>SecurityManager</code> 在现代版本中已弃用，安全边界依赖模块与平台机制</td>
+</tr>
+<tr>
+<td>健壮</td>
+<td>垃圾回收、异常处理、编译期类型检查</td>
+<td>逻辑错误仍需测试；GC 不负责所有资源</td>
+</tr>
+<tr>
+<td>架构中立</td>
+<td>基本类型的大小固定，不随平台变化</td>
+<td>具体内存布局仍由实现决定</td>
+</tr>
+<tr>
+<td>解释执行</td>
+<td>字节码由 JVM 解释</td>
+<td>HotSpot 等实现通过 JIT 把热点编译为机器码</td>
+</tr>
+<tr>
+<td>高性能</td>
+<td>字节码接近机器码，JIT 持续优化</td>
+<td>通常慢于 C、C++ 等直接编译的语言</td>
+</tr>
+<tr>
+<td>多线程</td>
+<td>语言与标准库内置线程支持</td>
+<td>共享状态仍需同步设计，见<a href="../advanced/concurrency/">并发编程</a></td>
+</tr>
+<tr>
+<td>分布式</td>
+<td>网络 API 与远程调用能力</td>
+<td>RMI 使用有限，现代应用多使用 HTTP 和 RPC</td>
+</tr>
+<tr>
+<td>动态</td>
+<td>类按需加载，支持反射</td>
+<td>模块系统会限制部分动态能力</td>
+</tr>
+</tbody>
+</table>
+<p>这些特性描述的是设计倾向，不是绝对承诺。实际开发中应结合具体场景判断。</p>
+<h2 id="c-java">C++ 与 Java 的对比<a class="headerlink" href="#c-java" title="链接到本节">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>比较项</th>
+<th>C++</th>
+<th>Java</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>运行方式</td>
+<td>编译为平台相关机器码</td>
+<td>编译为字节码，由 JVM 执行</td>
+</tr>
+<tr>
+<td>内存管理</td>
+<td>手动 <code>new</code>/<code>delete</code></td>
+<td>垃圾回收自动回收</td>
+</tr>
+<tr>
+<td>指针</td>
+<td>支持，可直接操作内存</td>
+<td>语言层面不暴露指针</td>
+</tr>
+<tr>
+<td>多重继承</td>
+<td>类支持多重继承</td>
+<td>类不支持，接口可以多实现</td>
+</tr>
+<tr>
+<td>运算符重载</td>
+<td>支持</td>
+<td>不支持</td>
+</tr>
+<tr>
+<td>泛型机制</td>
+<td>模板</td>
+<td>泛型与类型擦除</td>
+</tr>
+<tr>
+<td>默认参数</td>
+<td>支持</td>
+<td>不支持，通常用重载代替</td>
+</tr>
+<tr>
+<td>头文件</td>
+<td>使用 <code>#include</code></td>
+<td>使用 <code>import</code> 引入类型</td>
+</tr>
+<tr>
+<td>异常处理</td>
+<td>支持，可选</td>
+<td>受检异常必须处理或声明</td>
+</tr>
+<tr>
+<td>线程支持</td>
+<td>传统上依赖第三方库</td>
+<td>语言与标准库内置</td>
+</tr>
+<tr>
+<td>继承体系</td>
+<td>可以存在多个根</td>
+<td>所有类都直接或间接继承 <code>Object</code></td>
+</tr>
+<tr>
+<td><code>goto</code></td>
+<td>支持</td>
+<td>保留关键字，没有对应功能</td>
+</tr>
+</tbody>
+</table>
+<p>两者都能用于面向对象编程，但设计目标不同：C++ 更接近系统与硬件，Java 更强调跨平台运行和自动内存管理。</p>
+<h2 id="_1">数据类型<a class="headerlink" href="#_1" title="链接到本节">&para;</a></h2>
+<p>Java 是静态类型语言，变量需要先声明类型。类型分为基本类型和引用类型。</p>
+<table>
+<thead>
+<tr>
+<th>类型</th>
+<th>大小</th>
+<th>范围或说明</th>
+<th>默认值</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>boolean</code></td>
+<td>由实现决定</td>
+<td><code>true</code> 或 <code>false</code></td>
+<td><code>false</code></td>
+</tr>
+<tr>
+<td><code>char</code></td>
+<td>16 位</td>
+<td><code>'\u0000'</code> 到 <code>'￿'</code>，无符号</td>
+<td><code>'\u0000'</code></td>
+</tr>
+<tr>
+<td><code>byte</code></td>
+<td>8 位</td>
+<td>-128 到 127</td>
+<td><code>0</code></td>
+</tr>
+<tr>
+<td><code>short</code></td>
+<td>16 位</td>
+<td>-32,768 到 32,767</td>
+<td><code>0</code></td>
+</tr>
+<tr>
+<td><code>int</code></td>
+<td>32 位</td>
+<td>约 ±21 亿</td>
+<td><code>0</code></td>
+</tr>
+<tr>
+<td><code>long</code></td>
+<td>64 位</td>
+<td>约 ±9.2 × 10^18，后缀 <code>L</code></td>
+<td><code>0L</code></td>
+</tr>
+<tr>
+<td><code>float</code></td>
+<td>32 位</td>
+<td>IEEE 754 单精度，约 6—7 位有效数字，后缀 <code>F</code></td>
+<td><code>0.0F</code></td>
+</tr>
+<tr>
+<td><code>double</code></td>
+<td>64 位</td>
+<td>IEEE 754 双精度，约 15 位有效数字</td>
+<td><code>0.0D</code></td>
+</tr>
+</tbody>
+</table>
+<p><code>float</code> 不适合需要精确小数位数的场景（如金额），应使用 <code>BigDecimal</code> 或整数单位。Java 8 起可以通过 <code>Integer</code>、<code>Long</code> 的 API 按无符号数解释对应的 32 位、64 位值。</p>
+<p>类、接口、数组和 <code>String</code> 属于引用类型，默认值为 <code>null</code>。基本类型的大小固定，这也是“架构中立”特性的体现。详细用法见<a href="../basics/syntax/">核心：基本语法</a>。</p>
+<h2 id="unicode">Unicode 与字符编码<a class="headerlink" href="#unicode" title="链接到本节">&para;</a></h2>
+<p>计算机内部用二进制表示字符，这一映射关系称为编码。早期编码互不兼容：ASCII 用于美国，ISO 8859-1 用于西欧语言，GB18030、BIG-5 用于中文，不同编码的同一字节序列可能表示不同字符。</p>
+<p>Unicode 为世界上大多数书写系统统一分配码点。常见转换格式：</p>
+<table>
+<thead>
+<tr>
+<th>格式</th>
+<th>编码单元</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>UTF-8</td>
+<td>8 位</td>
+<td>变长编码，兼容 ASCII，网络传输常用</td>
+</tr>
+<tr>
+<td>UTF-16</td>
+<td>16 位</td>
+<td>Java 的 <code>char</code> 与 <code>String</code> 内部使用的编码单元</td>
+</tr>
+<tr>
+<td>UTF-32</td>
+<td>32 位</td>
+<td>定长，每个码点占 4 字节</td>
+</tr>
+</tbody>
+</table>
+<p>Java 源码中可以用转义序列书写 Unicode 字符，<code>\u</code> 后跟 4 位十六进制：</p>
+<div class="language-java highlight"><span class="filename">UnicodeDemo.java</span><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">UnicodeDemo</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">        </span><span class="kt">char</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="sc">&#39;A&#39;</span><span class="p">;</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">        </span><span class="kt">char</span><span class="w"> </span><span class="n">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="sc">&#39;B&#39;</span><span class="p">;</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">a</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">&quot;&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">b</span><span class="p">);</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">    </span><span class="p">}</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="p">}</span>
+</span></code></pre></div>
+<p><strong>输出：</strong></p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>AB
+</span></code></pre></div>
+<p><code>char</code> 是 16 位，最多表示 65,536 个码点，不足以覆盖全部 Unicode 字符。超出 16 位的字符称为增补字符，在 Java 中用一对 <code>char</code>（代理对）表示，因此 <code>"😀".length()</code> 为 <code>2</code> 而不是 <code>1</code>。按码点处理文本的方法见<a href="../basics/strings-arrays/">核心：字符串与数组</a>。</p>
+<h2 id="_2">运算符<a class="headerlink" href="#_2" title="链接到本节">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>类别</th>
+<th>运算符</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>一元</td>
+<td><code>+</code>、<code>-</code>、<code>!</code>、<code>~</code>、<code>++</code>、<code>--</code></td>
+<td>单个操作数，<code>++</code>、<code>--</code> 有前缀与后缀之分</td>
+</tr>
+<tr>
+<td>算术</td>
+<td><code>+</code>、<code>-</code>、<code>*</code>、<code>/</code>、<code>%</code></td>
+<td>整数除法向零截断</td>
+</tr>
+<tr>
+<td>移位</td>
+<td><code>&lt;&lt;</code>、<code>&gt;&gt;</code>、<code>&gt;&gt;&gt;</code></td>
+<td>操作二进制位，<code>&gt;&gt;&gt;</code> 高位补 0</td>
+</tr>
+<tr>
+<td>关系</td>
+<td><code>==</code>、<code>!=</code>、<code>&gt;</code>、<code>&gt;=</code>、<code>&lt;</code>、<code>&lt;=</code></td>
+<td>结果为 <code>boolean</code></td>
+</tr>
+<tr>
+<td>位运算</td>
+<td><code>&amp;</code>、<code>\|</code>、<code>^</code>、<code>~</code></td>
+<td>按位与、或、异或、取反</td>
+</tr>
+<tr>
+<td>逻辑</td>
+<td><code>&amp;&amp;</code>、<code>\|\|</code>、<code>!</code></td>
+<td><code>&amp;&amp;</code>、<code>\|\|</code> 短路求值</td>
+</tr>
+<tr>
+<td>条件</td>
+<td><code>条件 ? 值一 : 值二</code></td>
+<td>三元运算符</td>
+</tr>
+<tr>
+<td>赋值</td>
+<td><code>=</code>、<code>+=</code>、<code>-=</code> 等</td>
+<td>复合赋值隐含窄化转换</td>
+</tr>
+</tbody>
+</table>
+<p>运算符的优先级、类型提升与完整示例见<a href="../basics/syntax/">核心：基本语法</a>。</p>
+<h2 id="_3">参考资料<a class="headerlink" href="#_3" title="链接到本节">&para;</a></h2>
+<ul>
+<li><a href="https://www.tpointtech.com/java-tutorial">Tpoint Tech：Java Tutorial</a>，参考专题组织与示例讲解形式。</li>
+<li><a href="https://www.tpointtech.com/features-of-java">Tpoint Tech：Features of Java</a>。</li>
+<li><a href="https://www.tpointtech.com/cpp-vs-java">Tpoint Tech：Difference Between C++ and Java</a>。</li>
+<li><a href="https://www.tpointtech.com/java-data-types">Tpoint Tech：Data Types in Java</a>。</li>
+<li><a href="https://www.tpointtech.com/unicode-system-in-java">Tpoint Tech：Unicode System in Java</a>。</li>
+<li><a href="https://www.tpointtech.com/java-operators">Tpoint Tech：Java Operators</a>。</li>
+<li><a href="https://docs.oracle.com/javase/specs/jls/se21/html/jls-3.html#jls-3.9">Java 21 语言规范：Keywords</a>。</li>
+</ul>
+
+
+
+
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+                
+              </article>

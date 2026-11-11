@@ -1,0 +1,187 @@
+site_name: kosmigen
+site_description: C、Python、Java、计算机基础与 AI 的技术文档，以及项目实践和博客
+site_author: kosmigen
+site_url: https://kosmigen.github.io/PureLearning/
+repo_url: https://github.com/kosmigen/PureLearning
+repo_name: kosmigen
+edit_uri: edit/main/docs/
+copyright: Copyright &copy; 2026 kosmigen
+
+theme:
+  name: material
+  custom_dir: overrides
+  language: zh
+  logo: assets/images/cipher-wheel.svg
+  favicon: assets/images/cipher-wheel.svg
+  icon:
+    menu: lucide/menu
+    repo: fontawesome/brands/github
+    search: lucide/search
+  font: false
+  palette:
+    - media: "(prefers-color-scheme)"
+      primary: custom
+      accent: custom
+      toggle:
+        icon: lucide/sun-moon
+        name: 切换至浅色模式
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: custom
+      accent: custom
+      toggle:
+        icon: lucide/sun
+        name: 切换至深色模式
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: custom
+      accent: custom
+      toggle:
+        icon: lucide/moon-star
+        name: 跟随系统主题
+  features:
+    - navigation.instant
+    - navigation.instant.prefetch
+    - navigation.tabs
+    - navigation.indexes
+    - navigation.top
+    - navigation.tracking
+    - toc.follow
+    - search.suggest
+    - search.highlight
+    - search.share
+    - content.code.copy
+    - content.code.annotate
+    - content.tabs.link
+    - content.tooltips
+
+plugins:
+  - search:
+      lang:
+        - zh
+        - en
+  - awesome-nav
+  - meta
+  - blog:
+      blog_dir: blog
+      post_dir: "{blog}/posts"
+      post_url_format: "{date}/{slug}"
+      authors: true
+      authors_file: "{blog}/.authors.yml"
+      post_readtime: true
+      archive: true
+      archive_name: 时间归档
+      archive_date_format: yyyy 年 MM 月
+      archive_url_date_format: yyyy/MM
+      archive_url_format: "archive/{date}"
+      categories: false
+      pagination: true
+      pagination_per_page: 8
+      pagination_format: "$link_first $link_previous ~2~ $link_next $link_last"
+      draft: false
+  - tags:
+      filters:
+        include:
+          - blog/**
+      tags_name_property: categories
+
+hooks:
+  - hooks/icon_assets.py
+  - hooks/image_captions.py
+  - hooks/blog_metadata.py
+  - hooks/project_cards.py
+  - hooks/now.py
+  - hooks/navigation_icons.py
+  - hooks/diagrams.py
+
+markdown_extensions:
+  - abbr
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - toc:
+      title: On this page
+      permalink: true
+      permalink_title: 链接到本节
+  - pymdownx.caret
+  - pymdownx.details
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.keys
+  - pymdownx.mark
+  - pymdownx.snippets
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.tilde
+
+extra:
+  # Shared header and footer links; sidebar structure remains in .nav.yml files.
+  site_navigation:
+    - id: blog
+      title: 博客
+      title_en: Blog
+      url: blog/
+      paths: [blog/]
+    - id: docs
+      title: 文档
+      title_en: Docs
+      url: notes/overview/
+      paths: [notes/]
+      hide_sidebar_title_on_desktop: true
+    - id: projects
+      title: 项目
+      title_en: Projects
+      url: projects/
+      paths: [projects/]
+    - id: now
+      title: Now
+      title_en: Now
+      url: now/
+      paths: [now/]
+    - id: about
+      title: 关于
+      title_en: About
+      url: about/website/
+      paths: [about/]
+      hide_sidebar_title_on_desktop: true
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/kosmigen
+      name: GitHub
+    - icon: fontawesome/brands/x-twitter
+      link: https://x.com/kosmigen
+      name: X
+
+extra_css:
+  - assets/stylesheets/extra.css
+  - assets/stylesheets/site.css
+  - assets/stylesheets/search.css
+  - assets/stylesheets/sidebar.css
+  - assets/stylesheets/home.css
+  - assets/stylesheets/projects.css
+  - assets/stylesheets/now.css
+  - assets/stylesheets/blog.css
+  - assets/stylesheets/footer.css
+  - assets/stylesheets/not-found.css
+
+extra_javascript:
+  - assets/javascripts/site-navigation.mjs
+  - assets/javascripts/site-toc.mjs
+  - assets/javascripts/site-search.mjs
+  - assets/javascripts/sidebar-state.mjs
+  - assets/javascripts/home-animation.mjs
+  - assets/javascripts/projects.mjs
+  - assets/javascripts/diagram-drag.mjs
+  - assets/javascripts/footer-jelly.mjs

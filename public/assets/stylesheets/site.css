@@ -1,0 +1,124 @@
+/* One palette and one navigation shell for home, notes, projects and writing. */
+:root,
+[data-md-color-scheme] {
+  --md-default-bg-color: var(--color-paper);
+  --md-default-fg-color: var(--color-ink);
+  --md-default-fg-color--light: var(--color-muted);
+  --md-default-fg-color--lighter: var(--color-faint);
+  --md-default-fg-color--lightest: var(--color-rule);
+  --md-typeset-color: var(--color-ink);
+  --md-typeset-a-color: var(--color-accent-strong);
+  --md-typeset-mark-color: var(--color-accent-soft);
+  --md-primary-fg-color: var(--color-accent-strong);
+  --md-primary-fg-color--light: var(--color-accent);
+  --md-primary-fg-color--dark: var(--color-accent-strong);
+  --md-primary-bg-color: var(--color-accent-ink);
+  --md-primary-bg-color--light: var(--color-accent-ink);
+  --md-accent-fg-color: var(--color-accent-strong);
+  --md-accent-fg-color--transparent: color-mix(in srgb, var(--color-accent) 12%, transparent);
+  --md-accent-bg-color: var(--color-accent-ink);
+  --md-code-bg-color: var(--color-surface);
+  --md-code-fg-color: var(--color-ink);
+  --md-footer-bg-color: var(--color-paper);
+  --md-footer-bg-color--dark: var(--color-paper);
+  --md-footer-fg-color: var(--color-ink);
+  --md-footer-fg-color--light: var(--color-muted);
+  --md-footer-fg-color--lighter: var(--color-faint);
+  --site-header-height: 3.8rem;
+}
+
+body { background: var(--color-paper); }
+.kb-site-header {
+  position: sticky;
+  z-index: 4;
+  top: 0;
+  border-bottom: 1px solid var(--color-rule);
+  color: var(--color-ink);
+  background: var(--color-paper);
+  box-shadow: none;
+}
+.kb-site-header .md-header__inner {
+  height: 3.8rem;
+  max-width: 62rem;
+  padding-inline: .6rem;
+}
+.kb-site-header .md-header__title {
+  font-family: var(--font-display);
+  font-size: .82rem;
+  font-weight: 500;
+}
+.kb-site-header .md-header__topic[data-md-component="header-topic"] { display: none; }
+.kb-site-header .md-header__topic:first-child { transform: none; opacity: 1; }
+/* Lucide icons use strokes, while Material's other icons use solid fills. */
+.kb-site-header svg.lucide { fill: none; }
+.kb-site-header .md-header__button.md-logo img,
+.md-nav__button.md-logo img { filter: grayscale(1); }
+[data-md-color-scheme="slate"] .kb-site-header .md-header__button.md-logo img,
+[data-md-color-scheme="slate"] .md-nav__button.md-logo img { filter: brightness(0) invert(1); }
+.md-tabs { display: none; }
+
+.kb-site-navigation {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  display: flex;
+  height: 3.8rem;
+  align-items: center;
+  gap: clamp(.75rem, 2.1vw, 1.65rem);
+  transform: translateX(-50%);
+  font-family: var(--font-body);
+  font-size: .75rem;
+}
+.kb-site-navigation a {
+  position: relative;
+  display: inline-flex;
+  min-height: 2.2rem;
+  align-items: center;
+  padding-block: .5rem;
+  color: var(--color-muted);
+  text-decoration: none;
+  white-space: nowrap;
+}
+.kb-site-navigation a::after {
+  position: absolute;
+  bottom: .1rem;
+  inset-inline: 0;
+  height: 1px;
+  background: var(--color-accent);
+  content: "";
+  opacity: 0;
+}
+.kb-site-navigation a:hover,
+.kb-site-navigation a.is-active { color: var(--color-accent-strong); }
+.kb-site-navigation a.is-active::after { opacity: 1; }
+.kb-site-navigation a:focus-visible {
+  outline: var(--rule-focus) solid var(--color-focus);
+  outline-offset: var(--space-1);
+}
+
+.md-typeset :is(h1, h2, h3, h4, h5, h6)[id] {
+  scroll-margin-top: calc(var(--site-header-height) + 1rem);
+}
+
+@media (max-width: 76.24em) {
+  :root, [data-md-color-scheme] { --site-header-height: 3.2rem; }
+  .kb-site-header .md-header__inner,
+  .kb-site-navigation { height: 3.2rem; }
+}
+@media (max-width: 59.99em) {
+  :root, [data-md-color-scheme] { --site-header-height: 2.4rem; }
+  .kb-site-navigation { display: none; }
+  .kb-site-header {
+    border-bottom: 0;
+    background: color-mix(in srgb, var(--color-paper) 70%, transparent);
+    backdrop-filter: blur(8px);
+  }
+  .kb-site-header .md-header__inner { height: 2.4rem; padding-inline: .4rem; }
+  .kb-site-header .md-header__title { font-size: .9rem; font-weight: 600; }
+  .kb-site-header .md-header__button { margin: .2rem; padding: .4rem; }
+  .kb-site-header .md-header__button svg { width: 1rem; height: 1rem; }
+  .md-typeset h1 { color: var(--color-ink); }
+}
+@media (max-width: 39.99em) {
+  .kb-site-header .md-header__title { margin-inline: .4rem; }
+}
