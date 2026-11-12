@@ -1,7 +1,0 @@
-Character artwork: Snoopy, © Peanuts Worldwide LLC.
-Source: the official Peanuts character page, retrieved 2026-10-16.
-The downloaded character image is unmodified; presentation crops use CSS.
-
-snoopy.jpg
-https://www.peanuts.com/about/snoopy
-https://static.wixstatic.com/media/449abe_7b15686b2118476da4a733a7861dd772~mv2.jpg

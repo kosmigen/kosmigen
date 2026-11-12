@@ -1,7 +1,0 @@
-nav:
-  - 概览: overview.md
-  - 函数式编程: functional
-  - 反射与注解: reflection-annotations
-  - 网络编程: networking
-  - 并发编程: concurrency
-  - JVM: jvm
